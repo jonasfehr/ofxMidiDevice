@@ -11,6 +11,7 @@
 #include "Defines.h"
 #include "MidiComponent.h"
 #include "MidiComponentGroup.h"
+#include "ChannelStrip.h"
 
 #define DEBUG true
 
@@ -18,7 +19,8 @@
 class ofxMidiDevice : public ofxMidiListener{
 public:
     
-    map<string,MidiComponent> midiComponents;
+    map<string, MidiComponent> midiComponents;
+    map<string, ChannelStrip> channelStrips;
     ofxMidiIn midiIn;
     ofxMidiOut midiOut;
     
@@ -53,18 +55,28 @@ public:
             
             for(int i = 0; i < 8; i++){
                 this->addKnob("knob_"+ofToString(i+1),1,i+16);
-
+                
                 this->addFader("fader_"+ofToString(i+1),i+1,0);
-
+                
                 this->addButton("rec_"+ofToString(i+1), 1, i,CMT_NOTE_TOGGLE);
                 this->addButton("solo_"+ofToString(i+1), 1, i+8,CMT_NOTE_TOGGLE);
                 this->addButton("mute_"+ofToString(i+1), 1, i+16,CMT_NOTE_TOGGLE);
                 this->addButton("sel_"+ofToString(i+1), 1, i+24,CMT_NOTE_TOGGLE);
-
+                
             }
             
             this->addFader("fader_M",9,0);
+            
+            for(int i = 0; i < 8; i++){
+                string iStr = ofToString(i+1);
+                string name = "Channel_"+iStr;
+                ChannelStrip channelStrip;
+                channelStrip.setup(name, midiComponents["fader_"+iStr], midiComponents["knob_"+iStr], midiComponents["sel_"+iStr], midiComponents["mute_"+iStr], midiComponents["solo_"+iStr], midiComponents["rec_"+iStr]);
+                channelStrips[name] = channelStrip;
+                parameterGroup.add(channelStrips[name].parameterGroup);
 
+            }
+            
             
             // SETUP FOR LAUNCHPAD
         } else if(portName == "Launchpad"){
@@ -252,5 +264,6 @@ public:
     }
     
 };
+
 
 
