@@ -20,6 +20,7 @@ class ofxMidiDevice : public ofxMidiListener{
 public:
     
     map<string, MidiComponent> midiComponents;
+    map<string, MidiComponentGroup> midiComponentGroups;
     map<string, ChannelStrip> channelStrips;
     ofxMidiIn midiIn;
     ofxMidiOut midiOut;
@@ -74,6 +75,18 @@ public:
                 channelStrip.setup(name, midiComponents["fader_"+iStr], midiComponents["knob_"+iStr], midiComponents["sel_"+iStr], midiComponents["mute_"+iStr], midiComponents["solo_"+iStr], midiComponents["rec_"+iStr]);
                 channelStrips[name] = channelStrip;
                 parameterGroup.add(channelStrips[name].parameterGroup);
+                
+                
+                MidiComponentGroup midiComponentGroup;
+                midiComponentGroup.setup(name);
+                midiComponentGroup.add(midiComponents["fader_"+iStr]);
+                midiComponentGroup.add(midiComponents["knob_"+iStr]);
+                midiComponentGroup.add(midiComponents["sel_"+iStr]);
+                midiComponentGroup.add(midiComponents["mute_"+iStr]);
+                midiComponentGroup.add(midiComponents["solo_"+iStr]);
+                midiComponentGroup.add(midiComponents["rec_"+iStr]);
+                midiComponentGroups[name] = midiComponentGroup;
+                parameterGroup.add(midiComponentGroups[name].parameterGroup);
 
             }
             
