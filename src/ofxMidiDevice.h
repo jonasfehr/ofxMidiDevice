@@ -65,12 +65,48 @@ public:
                 this->addButton("sel_"+ofToString(i+1), 1, i+24,CMT_NOTE_TOGGLE);
                 
             }
-            
+            // Control section
             this->addFader("fader_M",9,0);
+            this->addButton("chan_down",1,48);
+            this->addButton("chan_up",1,49);
+            this->addButton("bank_down",1,46);
+            this->addButton("bank_up",1,47);
+            this->addButton("trans_down",1,91);
+            this->addButton("trans_up",1,92);
+            this->addButton("play",1,94);
+            this->addButton("stop",1,93);
+            this->addButton("rec",1,95);
+            this->addButton("rep",1,86);
+            this->addButton("mixer",1,78);
+            this->addButton("read",1,74);
+            this->addButton("write",1,75);
+            this->addKnob("jog",1,60);
             
+            MidiComponentGroup midiComponentGroup;
+            string name = "control_section";
+            midiComponentGroup.setup(name);
+            midiComponentGroup.add(midiComponents["fader_M"]);
+            midiComponentGroup.add(midiComponents["chan_down"]);
+            midiComponentGroup.add(midiComponents["chan_up"]);
+            midiComponentGroup.add(midiComponents["bank_down"]);
+            midiComponentGroup.add(midiComponents["bank_up"]);
+            midiComponentGroup.add(midiComponents["trans_down"]);
+            midiComponentGroup.add(midiComponents["trans_up"]);
+            midiComponentGroup.add(midiComponents["play"]);
+            midiComponentGroup.add(midiComponents["stop"]);
+            midiComponentGroup.add(midiComponents["rec"]);
+            midiComponentGroup.add(midiComponents["rep"]);
+            midiComponentGroup.add(midiComponents["mixer"]);
+            midiComponentGroup.add(midiComponents["read"]);
+            midiComponentGroup.add(midiComponents["write"]);
+            midiComponentGroup.add(midiComponents["jog"]);
+            midiComponentGroups[name] = midiComponentGroup;
+            parameterGroup.add(midiComponentGroups[name].parameterGroup);
+
+
             for(int i = 0; i < 8; i++){
                 string iStr = ofToString(i+1);
-                string name = "Channel_"+iStr;
+                string name = "channel_"+iStr;
                 ChannelStrip channelStrip;
                 channelStrip.setup(name, midiComponents["fader_"+iStr], midiComponents["knob_"+iStr], midiComponents["sel_"+iStr], midiComponents["mute_"+iStr], midiComponents["solo_"+iStr], midiComponents["rec_"+iStr]);
                 channelStrips[name] = channelStrip;
@@ -86,7 +122,7 @@ public:
                 midiComponentGroup.add(midiComponents["solo_"+iStr]);
                 midiComponentGroup.add(midiComponents["rec_"+iStr]);
                 midiComponentGroups[name] = midiComponentGroup;
-                parameterGroup.add(midiComponentGroups[name].parameterGroup);
+//                parameterGroup.add(midiComponentGroups[name].parameterGroup);
 
             }
             
@@ -263,7 +299,7 @@ public:
         midiComponents[name] =  midiComponent;
     }
     
-    void addButton(string name, int channel = 0, int controlChannel = 0, int controlMessageType = CMT_CONTROL_CHANGE){
+    void addButton(string name, int channel = 0, int controlChannel = 0, int controlMessageType = CMT_NOTE_TOGGLE){
         MidiComponent midiComponent;
         midiComponent.setInterface(midiIn, midiOut);
         midiComponent.interfaceType = IT_BUTTON;
