@@ -1,19 +1,19 @@
 //
-//  DeviceComponent.h
+//  Component.h
 //  MadMapper_oscQUery
 //
 //  Created by Jonas Fehr on 06/04/2018.
 //
 
-#ifndef DeviceComponent_h
-#define DeviceComponent_h
+#ifndef MidiComponent_h
+#define MidiComponent_h
 
 #include "ofxMidi.h"
 #include "Defines.h"
 
 
-// DeviceComponents
-class DeviceComponent : public ofxMidiListener{
+// Components
+class MidiComponent : public ofxMidiListener{
 public:
     ofxMidiIn * midiIn;
     ofxMidiOut * midiOut;
@@ -36,15 +36,15 @@ public:
     
     vector<unsigned char> message;
     
-    DeviceComponent(){};
-    ~DeviceComponent(){
-        //        midiIn->removeListener(this);
+    MidiComponent(){
+        this->value = 0;
+    };
+    ~MidiComponent(){
     };
     
     void setInterface(ofxMidiIn &midiIn, ofxMidiOut &midiOut){
         this->midiIn = &midiIn;
         this->midiOut = &midiOut;
-        //        this->midiIn->addListener(this); // does not work...
     }
     
     void newMidiMessage(ofxMidiMessage& msg){
@@ -126,16 +126,17 @@ public:
             switch(controlMessageType) {
                 case CMT_NOTE:
                 case CMT_NOTE_TOGGLE:
-                    midiOut->sendNoteOn(channel, pitch, float(value*127));
+                        midiOut->sendNoteOn(channel, pitch, float(value.get()*127));
+                
                     break;
                     
                 case CMT_CONTROL_CHANGE_ENCODER:
                 case CMT_CONTROL_CHANGE:
-                    midiOut->sendControlChange(channel, control, float(value*127));
+                    midiOut->sendControlChange(channel, control, float(value.get()*127));
                     break;
                     
                 case CMT_PITCH_BEND:
-                    midiOut->sendPitchBend(channel, float(value*MIDI_MAX_BEND));
+                    midiOut->sendPitchBend(channel, float(value.get()*MIDI_MAX_BEND));
                     
                     break;
                     
@@ -146,4 +147,4 @@ public:
     }
 };
 
-#endif /* DeviceComponent_h */
+#endif /* Component_h */

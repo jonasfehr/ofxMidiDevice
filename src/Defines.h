@@ -23,4 +23,9 @@ enum InterfaceTypes{
     // JOGWHEEL
 };
 
+enum GroupFunktions{
+    GF_NONE,
+    GF_CHECKBOX
+};
+
 #endif /* Defines_h */

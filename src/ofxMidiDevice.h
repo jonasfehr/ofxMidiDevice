@@ -9,7 +9,8 @@
 #include "ofMain.h"
 #include "ofxMidi.h"
 #include "Defines.h"
-#include "DeviceComponent.h"
+#include "MidiComponent.h"
+#include "MidiComponentGroup.h"
 
 #define DEBUG true
 
@@ -17,18 +18,18 @@
 class ofxMidiDevice : public ofxMidiListener{
 public:
     
-    vector<DeviceComponent> deviceComponents;
+    map<string,MidiComponent> midiComponents;
     ofxMidiIn midiIn;
     ofxMidiOut midiOut;
-
+    
     ofxMidiMessage midiMessage;
     stringstream text;
     
     ofxPanel gui;
     ofParameterGroup parameterGroup;
-
     
-
+    
+    
     ofxMidiDevice(){};
     ~ofxMidiDevice(){
         // clean up
@@ -36,25 +37,61 @@ public:
         midiOut.closePort();
         midiIn.removeListener(this);
     };
-   
+    
     void setup(string portName){
         midiIn.openPort(portName);
         midiOut.openPort(portName);
-
+        
         midiIn.ignoreTypes(true, true, true);     // ignore sysex, timing, & active sense messages,
         if(DEBUG) midiIn.setVerbose(true);
-
+        
         midiIn.addListener(this);
         
-//        for(int i = 0; i < 9; i++){
-//            this->addFader(i+1);
-//        }
-//        for(int i = 0; i < 8; i++){
-//            this->addKnob(1, 16+i);
-//        }
-//        for(int i = 0; i < 32; i++){
-//            this->addButton(1, i);
-//        }
+        
+        //  SETUP FOR PlatformM
+        if(portName == "Platform M+ V1.07"){
+            
+            for(int i = 0; i < 8; i++){
+                this->addKnob("knob_"+ofToString(i+1),1,i+16);
+
+                this->addFader("fader_"+ofToString(i+1),i+1,0);
+
+                this->addButton("rec_"+ofToString(i+1), 1, i,CMT_NOTE_TOGGLE);
+                this->addButton("solo_"+ofToString(i+1), 1, i+8,CMT_NOTE_TOGGLE);
+                this->addButton("mute_"+ofToString(i+1), 1, i+16,CMT_NOTE_TOGGLE);
+                this->addButton("sel_"+ofToString(i+1), 1, i+24,CMT_NOTE_TOGGLE);
+
+            }
+            
+            this->addFader("fader_M",9,0);
+
+            
+            // SETUP FOR LAUNCHPAD
+        } else if(portName == "Launchpad"){
+            for(int r = 0; r < 8; r++){
+                for(int c = 0; c < 8; c++){
+                    this->addButton("button_r_"+ofToString(r)+"_c_"+ofToString(c),1, c+r*16, CMT_NOTE_TOGGLE);
+                }
+            }
+        }
+        
+        
+        
+        //        for(int i = 0; i < 32; i++){
+        //            this->addButton(1, i);
+        //        }
+        
+        // Setup for Launchpad
+        
+        
+        for(auto & c:midiComponents){
+            c.second.value.setName(c.second.name);
+            parameterGroup.add(c.second.value);
+        }
+        
+        
+        gui.setup("MIDI in");
+        gui.add(parameterGroup);
     }
     
     void setupFromFile(string filename){
@@ -71,65 +108,65 @@ public:
         
         midiIn.addListener(this);
         
-        deviceComponents.clear();
-        for(auto & dc : deviceSetup["deviceComponents"]){
-            DeviceComponent newDeviceComponent;
-            newDeviceComponent.setInterface(midiIn, midiOut);
-            newDeviceComponent.interfaceType = dc["interfaceType"];
-            newDeviceComponent.controlMessageType = dc["controlMessageType"];
-            newDeviceComponent.doFeedback = dc["doFeedback"];
-            newDeviceComponent.channel = dc["channel"];
-            newDeviceComponent.pitch = dc["pitch"];
-            newDeviceComponent.control = dc["control"];
-            newDeviceComponent.value = (float)dc["value"];
-            newDeviceComponent.name = dc["name"];
-            deviceComponents.push_back(newDeviceComponent);
+        midiComponents.clear();
+        for(auto & c : deviceSetup["midiComponents"]){
+            MidiComponent midiComponent;
+            midiComponent.setInterface(midiIn, midiOut);
+            midiComponent.interfaceType = c["interfaceType"];
+            midiComponent.controlMessageType = c["controlMessageType"];
+            midiComponent.doFeedback = c["doFeedback"];
+            midiComponent.channel = c["channel"];
+            midiComponent.pitch = c["pitch"];
+            midiComponent.control = c["control"];
+            midiComponent.value = (float)c["value"];
+            midiComponent.name = c["name"];
+            midiComponents[c["name"]] =  midiComponent;
         }
         
-        for(auto & dC:deviceComponents){
-            dC.value.setName(dC.name);
-            parameterGroup.add(dC.value);
+        for(auto & c:midiComponents){
+            c.second.value.setName(c.second.name);
+            parameterGroup.add(c.second.value);
         }
         
         
         gui.setup("MIDI in");
         gui.add(parameterGroup);
-
+        
     }
     
     void update(){
-        for(auto & dC:deviceComponents){
-            dC.update();
+        for(auto & c:midiComponents){
+            c.second.update();
         }
     }
     
-    void saveDeviceComponentsToFile(string filename){
+    void saveMidiComponentsToFile(string filename){
         ofJson deviceSetup;// = ofLoadJson(filename);
         deviceSetup["midiIn"] = midiIn.getName();
         deviceSetup["midiOut"] = midiOut.getName();
         int i = 0;
-        for( auto & dC : deviceComponents){
-            string componentNr = "component_"+ofToString(i);
-            deviceSetup["deviceComponents"][componentNr]["interfaceType"] = dC.interfaceType;
-            deviceSetup["deviceComponents"][componentNr]["controlMessageType"] = dC.controlMessageType;
-            deviceSetup["deviceComponents"][componentNr]["doFeedback"] = dC.doFeedback;
-            deviceSetup["deviceComponents"][componentNr]["channel"] = dC.channel;
-            deviceSetup["deviceComponents"][componentNr]["pitch"] = dC.pitch;
-            deviceSetup["deviceComponents"][componentNr]["control"] = dC.control;
-            deviceSetup["deviceComponents"][componentNr]["value"] = (float)dC.value;
-            deviceSetup["deviceComponents"][componentNr]["name"] = dC.name;
+        for( auto & c : midiComponents){
+            string name = c.second.name;
+            deviceSetup["midiComponents"][name]["interfaceType"] = c.second.interfaceType;
+            deviceSetup["midiComponents"][name]["controlMessageType"] = c.second.controlMessageType;
+            deviceSetup["midiComponents"][name]["doFeedback"] = c.second.doFeedback;
+            deviceSetup["midiComponents"][name]["channel"] = c.second.channel;
+            deviceSetup["midiComponents"][name]["pitch"] = c.second.pitch;
+            deviceSetup["midiComponents"][name]["control"] = c.second.control;
+            deviceSetup["midiComponents"][name]["value"] = (float)c.second.value;
+            deviceSetup["midiComponents"][name]["name"] = c.second.name;
             i++;
         }
-
+        
         ofSavePrettyJson(filename, deviceSetup);
-
+        
     }
     
     
     void newMidiMessage(ofxMidiMessage& msg){
         midiMessage = msg;
-        for( auto & dC : deviceComponents){
-            dC.newMidiMessage(msg);
+        for( auto & c : midiComponents){
+            c.second.newMidiMessage(msg);
         }
     }
     
@@ -176,41 +213,44 @@ public:
     }
     
     
-    void addFader(ofParameter<float> & parameter, int channel = 0, int controlChannel = 0, int controlMessageType = CMT_PITCH_BEND){
-        DeviceComponent newDeviceComponent;
-        newDeviceComponent.setInterface(midiIn, midiOut);
-        newDeviceComponent.interfaceType = IT_FADER;
-        newDeviceComponent.controlMessageType = controlMessageType;
-        newDeviceComponent.doFeedback = true;
-        newDeviceComponent.channel = channel;
-        newDeviceComponent.control = controlChannel;
-        newDeviceComponent.value.makeReferenceTo(parameter);
-        deviceComponents.push_back(newDeviceComponent);
+    void addFader(string name, int channel = 0, int controlChannel = 0, int controlMessageType = CMT_PITCH_BEND){
+        MidiComponent midiComponent;
+        midiComponent.setInterface(midiIn, midiOut);
+        midiComponent.interfaceType = IT_FADER;
+        midiComponent.controlMessageType = controlMessageType;
+        midiComponent.doFeedback = true;
+        midiComponent.channel = channel;
+        midiComponent.control = controlChannel;
+        midiComponent.name = name;
+        midiComponents[name] =  midiComponent;
     }
     
-    void addKnob(int channel, int control){
-        DeviceComponent newDeviceComponent;
-        newDeviceComponent.setInterface(midiIn, midiOut);
-        newDeviceComponent.interfaceType = IT_KNOB;
-        newDeviceComponent.controlMessageType = CMT_CONTROL_CHANGE_ENCODER;
-        newDeviceComponent.doFeedback = false;
-        newDeviceComponent.channel = channel;
-        newDeviceComponent.control = control;
-        newDeviceComponent.value = 0;
-        deviceComponents.push_back(newDeviceComponent);
-
+    void addKnob(string name, int channel, int control, int controlMessageType = CMT_CONTROL_CHANGE_ENCODER){
+        MidiComponent midiComponent;
+        midiComponent.setInterface(midiIn, midiOut);
+        midiComponent.interfaceType = IT_KNOB;
+        midiComponent.controlMessageType = controlMessageType;
+        midiComponent.doFeedback = false;
+        midiComponent.channel = channel;
+        midiComponent.control = control;
+        midiComponent.value = 0;
+        midiComponent.name = name;
+        midiComponents[name] =  midiComponent;
     }
     
-    void addButton(ofParameter<float> & parameter, int channel = 0, int controlChannel = 0, int controlMessageType = CMT_CONTROL_CHANGE){
-        DeviceComponent newDeviceComponent;
-        newDeviceComponent.setInterface(midiIn, midiOut);
-        newDeviceComponent.interfaceType = IT_BUTTON;
-        newDeviceComponent.controlMessageType = controlMessageType;
-        newDeviceComponent.doFeedback = true;
-        newDeviceComponent.channel = channel;
-        newDeviceComponent.control = controlChannel;
-        newDeviceComponent.value.makeReferenceTo(parameter);
-        deviceComponents.push_back(newDeviceComponent);
-
+    void addButton(string name, int channel = 0, int controlChannel = 0, int controlMessageType = CMT_CONTROL_CHANGE){
+        MidiComponent midiComponent;
+        midiComponent.setInterface(midiIn, midiOut);
+        midiComponent.interfaceType = IT_BUTTON;
+        midiComponent.controlMessageType = controlMessageType;
+        midiComponent.doFeedback = true;
+        midiComponent.channel = channel;
+        midiComponent.control = controlChannel;
+        midiComponent.pitch = controlChannel;
+        midiComponent.name = name;
+        midiComponents[name] =  midiComponent;
     }
+    
 };
+
+
