@@ -132,7 +132,7 @@ public:
                 case CMT_NOTE_TOGGLE:
                     if(interfaceType == IT_BUTTON_LP){
                         if(value.get() > 0){
-                          midiOut->sendNoteOn(channel, pitch, 60);
+                          midiOut->sendNoteOn(channel, pitch, 63);
                         }
                         else {
                          midiOut->sendNoteOn(channel, pitch, 0);
@@ -147,7 +147,7 @@ public:
                 case CMT_CONTROL_CHANGE:
                     if(interfaceType == IT_BUTTON_LP){
                         if(value.get() > 0){
-                            midiOut->sendControlChange(channel, control, 60);
+                            midiOut->sendControlChange(channel, control, 63);
                         }
                         else{
                             midiOut->sendControlChange(channel, control, 0);

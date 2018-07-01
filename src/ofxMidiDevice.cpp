@@ -327,6 +327,20 @@ void ofxMidiDevice::setupLaunchpad(){
     midiComponentGroups[name] = midiComponentGroup;
     parameterGroup.add(midiComponentGroups[name].parameterGroup);
     
+    // SETUP ROW PLAYER
+    midiComponentGroup.clear();
+    name = "full_row_play";
+    midiComponentGroup.setup(name);
+    
+    for(int r = 0; r < 8; r++){
+        string bName = "row_"+ofToString(r);
+        this->addButtonLP(bName,1, r*16+8, CMT_NOTE_TOGGLE);
+        
+        midiComponentGroup.add(midiComponents[bName]);
+    }
+    midiComponentGroups[name] = midiComponentGroup;
+    parameterGroup.add(midiComponentGroups[name].parameterGroup);
+    
 
 
     
