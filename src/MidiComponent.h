@@ -38,8 +38,10 @@ public:
     
     MidiComponent(){
         this->value = 0;
+        value.addListener(this,&MidiComponent::onValueChange);
     };
     ~MidiComponent(){
+        value.removeListener(this,&MidiComponent::onValueChange);
     };
     
     void setInterface(ofxMidiIn &midiIn, ofxMidiOut &midiOut){
@@ -54,7 +56,7 @@ public:
                 case MIDI_NOTE_OFF:
                     if(msg.pitch == pitch){
                         if(controlMessageType == CMT_NOTE){
-                            if(interfaceType == IT_BUTTON){
+                            if(interfaceType == IT_BUTTON || interfaceType == IT_BUTTON_LP){
                                 if(msg.velocity > 63) value = 1;
                                 else value = 0;
                             } else if(interfaceType == IT_FADER || interfaceType == IT_KNOB){
@@ -66,9 +68,8 @@ public:
                                 else value = 1.;
                             }
                         }
-                        
                         this->update();
-                        return true;
+
                     }
                     break;
                     
@@ -77,16 +78,20 @@ public:
                         if(controlMessageType == CMT_CONTROL_CHANGE){
                             value = ofMap(msg.value, 0, 127, value.getMin(), value.getMax());
                             this->update();
-                            return true;
                             
                         } else if(controlMessageType == CMT_CONTROL_CHANGE_ENCODER){
                             if(msg.value > 64) value += -(msg.value-64)*encoderStep;
                             else value += msg.value*encoderStep;
-                            
                             if(value < 0.) value = 0.;
                             if(value > 1.) value = 1.;
                             this->update();
-                            return true;
+                            
+                        }else if(controlMessageType == CMT_CONTROL_CHANGE_TOGGLE){
+                            if(msg.value > 63){
+                                if(value == 1) value = 0.;
+                                else value = 1.;
+                            }
+                            this->update();
                         }
                     }
                     
@@ -102,7 +107,6 @@ public:
                         value = (msg.value/float(MIDI_MAX_BEND));
                         
                         this->update();
-                        return true;
                     }
                     break;
                     
@@ -126,13 +130,31 @@ public:
             switch(controlMessageType) {
                 case CMT_NOTE:
                 case CMT_NOTE_TOGGLE:
+                    if(interfaceType == IT_BUTTON_LP){
+                        if(value.get() > 0){
+                          midiOut->sendNoteOn(channel, pitch, 60);
+                        }
+                        else {
+                         midiOut->sendNoteOn(channel, pitch, 0);
+                        }
+                    }else{
                         midiOut->sendNoteOn(channel, pitch, float(value.get()*127));
-                
+                    }
                     break;
                     
+                case CMT_CONTROL_CHANGE_TOGGLE:
                 case CMT_CONTROL_CHANGE_ENCODER:
                 case CMT_CONTROL_CHANGE:
-                    midiOut->sendControlChange(channel, control, float(value.get()*127));
+                    if(interfaceType == IT_BUTTON_LP){
+                        if(value.get() > 0){
+                            midiOut->sendControlChange(channel, control, 60);
+                        }
+                        else{
+                            midiOut->sendControlChange(channel, control, 0);
+                        }
+                    }else{
+                        midiOut->sendControlChange(channel, control, float(value.get()*127));
+                    }
                     break;
                     
                 case CMT_PITCH_BEND:
@@ -145,6 +167,11 @@ public:
             }
         }
     }
+    
+    void onValueChange(float & p){
+        this->update();
+    }
+
 };
 
 #endif /* Component_h */

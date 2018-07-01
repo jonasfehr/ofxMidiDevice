@@ -29,6 +29,10 @@ public:
         parameterGroup.add(this->midiComponents[midiComponent.name]->value);
     }
 
+    void clear(){
+        midiComponents.clear();
+        parameterGroup.clear();
+    }
 };
 
 #endif /* ComponentGroup_h */

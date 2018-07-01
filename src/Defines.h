@@ -9,17 +9,20 @@
 #define Defines_h
 
 enum ControlMessageTypes{
-    CMT_NOTE = 0,
-    CMT_NOTE_TOGGLE = 1,
-    CMT_CONTROL_CHANGE = 2,
-    CMT_CONTROL_CHANGE_ENCODER = 3,
-    CMT_PITCH_BEND = 4
+    CMT_NOTE,
+    CMT_NOTE_TOGGLE,
+    CMT_NOTE_IMPULSE,
+    CMT_CONTROL_CHANGE,
+    CMT_CONTROL_CHANGE_TOGGLE,
+    CMT_CONTROL_CHANGE_ENCODER,
+    CMT_PITCH_BEND
 };
 
 enum InterfaceTypes{
     IT_FADER,
     IT_KNOB,
-    IT_BUTTON
+    IT_BUTTON,
+    IT_BUTTON_LP // sepcial feedback for LaunchPad
     // JOGWHEEL
 };
 
