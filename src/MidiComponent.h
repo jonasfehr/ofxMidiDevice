@@ -131,8 +131,10 @@ public:
                 case CMT_NOTE:
                 case CMT_NOTE_TOGGLE:
                     if(interfaceType == IT_BUTTON_LP){
-                        if(value.get() > 0){
-                          midiOut->sendNoteOn(channel, pitch, 63);
+                        if(value.get() > 0 && value.get() < 0.5){
+                          midiOut->sendNoteOn(channel, pitch, 15);
+                        } else if(value.get() > 0.5){
+                            midiOut->sendNoteOn(channel, pitch, 63);
                         }
                         else {
                          midiOut->sendNoteOn(channel, pitch, 0);
