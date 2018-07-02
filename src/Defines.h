@@ -11,7 +11,6 @@
 enum ControlMessageTypes{
     CMT_NOTE,
     CMT_NOTE_TOGGLE,
-    CMT_NOTE_IMPULSE,
     CMT_CONTROL_CHANGE,
     CMT_CONTROL_CHANGE_TOGGLE,
     CMT_CONTROL_CHANGE_ENCODER,
@@ -23,12 +22,7 @@ enum InterfaceTypes{
     IT_KNOB,
     IT_BUTTON,
     IT_BUTTON_LP // sepcial feedback for LaunchPad
-    // JOGWHEEL
 };
 
-enum GroupFunktions{
-    GF_NONE,
-    GF_CHECKBOX
-};
 
 #endif /* Defines_h */

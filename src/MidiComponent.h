@@ -34,6 +34,8 @@ public:
     
     string name;
     
+    ofEvent<string> changedE;
+    
     vector<unsigned char> message;
     
     MidiComponent(){
@@ -172,6 +174,8 @@ public:
     
     void onValueChange(float & p){
         this->update();
+        
+        ofNotifyEvent(changedE,this->name, this);
     }
 
 };

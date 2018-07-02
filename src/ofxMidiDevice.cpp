@@ -234,7 +234,7 @@ void ofxMidiDevice::setupPlatformM(){
     this->addButton("stop",1,93,CMT_NOTE_TOGGLE);
     this->addButton("rec",1,95,CMT_NOTE_TOGGLE);
     this->addButton("rep",1,86,CMT_NOTE_TOGGLE);
-    this->addButton("mixer",1,78,CMT_NOTE_TOGGLE);
+    this->addButton("mixer",1,84,CMT_NOTE);
     this->addButton("read",1,74,CMT_NOTE_TOGGLE);
     this->addButton("write",1,75,CMT_NOTE_TOGGLE);
     this->addKnob("jog",1,60,CMT_CONTROL_CHANGE_ENCODER);
