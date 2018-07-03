@@ -216,9 +216,9 @@ void ofxMidiDevice::setupPlatformM(){
         
         this->addFader("fader_"+ofToString(i+1),i+1,0,CMT_PITCH_BEND);
         
-        this->addButton("rec_"+ofToString(i+1), 1, i,CMT_NOTE_TOGGLE);
-        this->addButton("solo_"+ofToString(i+1), 1, i+8,CMT_NOTE_TOGGLE);
-        this->addButton("mute_"+ofToString(i+1), 1, i+16,CMT_NOTE_TOGGLE);
+        this->addButton("rec_"+ofToString(i+1), 1, i,CMT_NOTE);
+        this->addButton("solo_"+ofToString(i+1), 1, i+8,CMT_NOTE);
+        this->addButton("mute_"+ofToString(i+1), 1, i+16,CMT_NOTE);
         this->addButton("sel_"+ofToString(i+1), 1, i+24,CMT_NOTE_TOGGLE);
         
     }
@@ -233,7 +233,7 @@ void ofxMidiDevice::setupPlatformM(){
     this->addButton("play",1,94,CMT_NOTE_TOGGLE);
     this->addButton("stop",1,93,CMT_NOTE_TOGGLE);
     this->addButton("rec",1,95,CMT_NOTE_TOGGLE);
-    this->addButton("rep",1,86,CMT_NOTE_TOGGLE);
+    this->addButton("rep",1,86,CMT_NOTE);
     this->addButton("mixer",1,84,CMT_NOTE);
     this->addButton("read",1,74,CMT_NOTE_TOGGLE);
     this->addButton("write",1,75,CMT_NOTE_TOGGLE);
