@@ -34,7 +34,7 @@ public:
     ofxMidiDevice();
     ~ofxMidiDevice();
     
-    void setup(string portName);
+    void setup(string inputPortName, string outputPortName);
     
     void setupFromFile(string filename);
     

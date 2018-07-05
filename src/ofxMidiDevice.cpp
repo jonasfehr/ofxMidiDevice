@@ -16,25 +16,25 @@ ofxMidiDevice::~ofxMidiDevice(){
     midiIn.removeListener(this);
 };
 
-void ofxMidiDevice::setup(string portName){
-    midiIn.openPort(portName);
-    midiOut.openPort(portName);
+void ofxMidiDevice::setup(string inputPortName, string outputPortName){
+    midiIn.openPort(inputPortName);
+    midiOut.openPort(outputPortName);
     
     midiIn.ignoreTypes(true, true, true);     // ignore sysex, timing, & active sense messages,
     midiIn.setVerbose(true);
     
     midiIn.addListener(this);
     
-    parameterGroup.setName(portName);
+    parameterGroup.setName(inputPortName);
     
     //  SETUP FOR SPECIFIC PLATFORMS
-    if(portName == "Platform M+ V2.00"){
+//    if(inputPortName == "Platform M+ V2.00"){
         setupPlatformM();
-        
-    } else if(portName == "Launchpad"){
-        setupLaunchpad();
-        
-    }
+//
+//    } else if(inputPortName == "Launchpad"){
+//        setupLaunchpad();
+//
+//    }
     
     gui.setup("MIDI in");
     gui.add(parameterGroup);
