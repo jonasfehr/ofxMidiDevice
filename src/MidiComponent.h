@@ -19,10 +19,11 @@ public:
     ofxMidiOut * midiOut;
     
     ofParameter<float> value;
+    float valueOld=0;
     
     bool doFeedback;
     
-    float encoderStep = 0.01;
+    float encoderStep = 0.001;
     
     int interfaceType;
     
@@ -129,6 +130,9 @@ public:
     
     void update(){
         if(doFeedback){
+            float diff = abs(value.get()-valueOld);
+            if(diff < 0.01 && diff > 0) return; // just update if difference bigger than 1/100, to avoid over flow of data to MIDI device.
+            valueOld = value.get();
             switch(controlMessageType) {
                 case CMT_NOTE:
                 case CMT_NOTE_TOGGLE:
@@ -163,7 +167,6 @@ public:
                     
                 case CMT_PITCH_BEND:
                     midiOut->sendPitchBend(channel, float(value.get()*MIDI_MAX_BEND));
-                    
                     break;
                     
                 default:
@@ -174,7 +177,7 @@ public:
     
     void onValueChange(float & p){
         this->update();
-        
+
         ofNotifyEvent(changedE,this->name, this);
     }
 

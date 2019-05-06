@@ -217,7 +217,7 @@ void ofxMidiDevice::setupPlatformM(){
         this->addFader("fader_"+ofToString(i+1),i+1,0,CMT_PITCH_BEND);
         
         this->addButton("rec_"+ofToString(i+1), 1, i,CMT_NOTE);
-        this->addButton("solo_"+ofToString(i+1), 1, i+8,CMT_NOTE);
+        this->addButton("solo_"+ofToString(i+1), 1, i+8,CMT_NOTE_TOGGLE);
         this->addButton("mute_"+ofToString(i+1), 1, i+16,CMT_NOTE);
         this->addButton("sel_"+ofToString(i+1), 1, i+24,CMT_NOTE_TOGGLE);
         
