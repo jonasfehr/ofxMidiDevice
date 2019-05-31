@@ -56,6 +56,8 @@ public:
     
     void addButtonLP(string name, int channel = 0, int controlChannel = 0, int controlMessageType = CMT_NOTE_TOGGLE);
     
+    void addMidiComponentGroup(MidiComponentGroup & midiComponentGroup);
+    
     void setupPlatformM();
     
     void setupLaunchpad();
