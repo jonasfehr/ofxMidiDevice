@@ -28,13 +28,11 @@ void ofxMidiDevice::setup(string inputPortName, string outputPortName){
     parameterGroup.setName(inputPortName);
     
     //  SETUP FOR SPECIFIC PLATFORMS
-//    if(inputPortName == "Platform M+ V2.00"){
+    if(inputPortName == "Platform M+ V2.00"){
         setupPlatformM();
-//
-//    } else if(inputPortName == "Launchpad"){
-//        setupLaunchpad();
-//
-//    }
+    } else if(inputPortName == "Launchpad"){
+        setupLaunchpad();
+    }
     
     gui.setup("MIDI in");
     gui.add(parameterGroup);
