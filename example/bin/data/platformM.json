@@ -1,0 +1,636 @@
+{
+    "midiComponents": {
+        "bank_down": {
+            "channel": 1,
+            "control": 46,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "bank_down",
+            "pitch": 46,
+            "value": 0.0
+        },
+        "bank_up": {
+            "channel": 1,
+            "control": 47,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "bank_up",
+            "pitch": 47,
+            "value": 0.0
+        },
+        "chan_down": {
+            "channel": 1,
+            "control": 48,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "chan_down",
+            "pitch": 48,
+            "value": 0.0
+        },
+        "chan_up": {
+            "channel": 1,
+            "control": 49,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "chan_up",
+            "pitch": 49,
+            "value": 0.0
+        },
+        "fader_1": {
+            "channel": 1,
+            "control": 0,
+            "controlMessageType": 5,
+            "doFeedback": true,
+            "interfaceType": 0,
+            "name": "fader_1",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "fader_2": {
+            "channel": 2,
+            "control": 0,
+            "controlMessageType": 5,
+            "doFeedback": true,
+            "interfaceType": 0,
+            "name": "fader_2",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "fader_3": {
+            "channel": 3,
+            "control": 0,
+            "controlMessageType": 5,
+            "doFeedback": true,
+            "interfaceType": 0,
+            "name": "fader_3",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "fader_4": {
+            "channel": 4,
+            "control": 0,
+            "controlMessageType": 5,
+            "doFeedback": true,
+            "interfaceType": 0,
+            "name": "fader_4",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "fader_5": {
+            "channel": 5,
+            "control": 0,
+            "controlMessageType": 5,
+            "doFeedback": true,
+            "interfaceType": 0,
+            "name": "fader_5",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "fader_6": {
+            "channel": 6,
+            "control": 0,
+            "controlMessageType": 5,
+            "doFeedback": true,
+            "interfaceType": 0,
+            "name": "fader_6",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "fader_7": {
+            "channel": 7,
+            "control": 0,
+            "controlMessageType": 5,
+            "doFeedback": true,
+            "interfaceType": 0,
+            "name": "fader_7",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "fader_8": {
+            "channel": 8,
+            "control": 0,
+            "controlMessageType": 5,
+            "doFeedback": true,
+            "interfaceType": 0,
+            "name": "fader_8",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "fader_M": {
+            "channel": 9,
+            "control": 0,
+            "controlMessageType": 5,
+            "doFeedback": true,
+            "interfaceType": 0,
+            "name": "fader_M",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "jog": {
+            "channel": 1,
+            "control": 60,
+            "controlMessageType": 4,
+            "doFeedback": false,
+            "interfaceType": 1,
+            "name": "jog",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "knob_1": {
+            "channel": 1,
+            "control": 16,
+            "controlMessageType": 4,
+            "doFeedback": false,
+            "interfaceType": 1,
+            "name": "knob_1",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "knob_2": {
+            "channel": 1,
+            "control": 17,
+            "controlMessageType": 4,
+            "doFeedback": false,
+            "interfaceType": 1,
+            "name": "knob_2",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "knob_3": {
+            "channel": 1,
+            "control": 18,
+            "controlMessageType": 4,
+            "doFeedback": false,
+            "interfaceType": 1,
+            "name": "knob_3",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "knob_4": {
+            "channel": 1,
+            "control": 19,
+            "controlMessageType": 4,
+            "doFeedback": false,
+            "interfaceType": 1,
+            "name": "knob_4",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "knob_5": {
+            "channel": 1,
+            "control": 20,
+            "controlMessageType": 4,
+            "doFeedback": false,
+            "interfaceType": 1,
+            "name": "knob_5",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "knob_6": {
+            "channel": 1,
+            "control": 21,
+            "controlMessageType": 4,
+            "doFeedback": false,
+            "interfaceType": 1,
+            "name": "knob_6",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "knob_7": {
+            "channel": 1,
+            "control": 22,
+            "controlMessageType": 4,
+            "doFeedback": false,
+            "interfaceType": 1,
+            "name": "knob_7",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "knob_8": {
+            "channel": 1,
+            "control": 23,
+            "controlMessageType": 4,
+            "doFeedback": false,
+            "interfaceType": 1,
+            "name": "knob_8",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "mixer": {
+            "channel": 1,
+            "control": 84,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "mixer",
+            "pitch": 84,
+            "value": 0.0
+        },
+        "mute_1": {
+            "channel": 1,
+            "control": 16,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "mute_1",
+            "pitch": 16,
+            "value": 0.0
+        },
+        "mute_2": {
+            "channel": 1,
+            "control": 17,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "mute_2",
+            "pitch": 17,
+            "value": 0.0
+        },
+        "mute_3": {
+            "channel": 1,
+            "control": 18,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "mute_3",
+            "pitch": 18,
+            "value": 0.0
+        },
+        "mute_4": {
+            "channel": 1,
+            "control": 19,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "mute_4",
+            "pitch": 19,
+            "value": 0.0
+        },
+        "mute_5": {
+            "channel": 1,
+            "control": 20,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "mute_5",
+            "pitch": 20,
+            "value": 0.0
+        },
+        "mute_6": {
+            "channel": 1,
+            "control": 21,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "mute_6",
+            "pitch": 21,
+            "value": 0.0
+        },
+        "mute_7": {
+            "channel": 1,
+            "control": 22,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "mute_7",
+            "pitch": 22,
+            "value": 0.0
+        },
+        "mute_8": {
+            "channel": 1,
+            "control": 23,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "mute_8",
+            "pitch": 23,
+            "value": 0.0
+        },
+        "play": {
+            "channel": 1,
+            "control": 94,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "play",
+            "pitch": 94,
+            "value": 0.0
+        },
+        "read": {
+            "channel": 1,
+            "control": 74,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "read",
+            "pitch": 74,
+            "value": 0.0
+        },
+        "rec": {
+            "channel": 1,
+            "control": 95,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "rec",
+            "pitch": 95,
+            "value": 0.0
+        },
+        "rec_1": {
+            "channel": 1,
+            "control": 0,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "rec_1",
+            "pitch": 0,
+            "value": 0.0
+        },
+        "rec_2": {
+            "channel": 1,
+            "control": 1,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "rec_2",
+            "pitch": 1,
+            "value": 0.0
+        },
+        "rec_3": {
+            "channel": 1,
+            "control": 2,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "rec_3",
+            "pitch": 2,
+            "value": 0.0
+        },
+        "rec_4": {
+            "channel": 1,
+            "control": 3,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "rec_4",
+            "pitch": 3,
+            "value": 0.0
+        },
+        "rec_5": {
+            "channel": 1,
+            "control": 4,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "rec_5",
+            "pitch": 4,
+            "value": 0.0
+        },
+        "rec_6": {
+            "channel": 1,
+            "control": 5,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "rec_6",
+            "pitch": 5,
+            "value": 0.0
+        },
+        "rec_7": {
+            "channel": 1,
+            "control": 6,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "rec_7",
+            "pitch": 6,
+            "value": 0.0
+        },
+        "rec_8": {
+            "channel": 1,
+            "control": 7,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "rec_8",
+            "pitch": 7,
+            "value": 0.0
+        },
+        "rep": {
+            "channel": 1,
+            "control": 86,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "rep",
+            "pitch": 86,
+            "value": 0.0
+        },
+        "sel_1": {
+            "channel": 1,
+            "control": 24,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "sel_1",
+            "pitch": 24,
+            "value": 0.0
+        },
+        "sel_2": {
+            "channel": 1,
+            "control": 25,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "sel_2",
+            "pitch": 25,
+            "value": 0.0
+        },
+        "sel_3": {
+            "channel": 1,
+            "control": 26,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "sel_3",
+            "pitch": 26,
+            "value": 0.0
+        },
+        "sel_4": {
+            "channel": 1,
+            "control": 27,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "sel_4",
+            "pitch": 27,
+            "value": 0.0
+        },
+        "sel_5": {
+            "channel": 1,
+            "control": 28,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "sel_5",
+            "pitch": 28,
+            "value": 0.0
+        },
+        "sel_6": {
+            "channel": 1,
+            "control": 29,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "sel_6",
+            "pitch": 29,
+            "value": 0.0
+        },
+        "sel_7": {
+            "channel": 1,
+            "control": 30,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "sel_7",
+            "pitch": 30,
+            "value": 0.0
+        },
+        "sel_8": {
+            "channel": 1,
+            "control": 31,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "sel_8",
+            "pitch": 31,
+            "value": 0.0
+        },
+        "solo_1": {
+            "channel": 1,
+            "control": 8,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "solo_1",
+            "pitch": 8,
+            "value": 0.0
+        },
+        "solo_2": {
+            "channel": 1,
+            "control": 9,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "solo_2",
+            "pitch": 9,
+            "value": 0.0
+        },
+        "solo_3": {
+            "channel": 1,
+            "control": 10,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "solo_3",
+            "pitch": 10,
+            "value": 0.0
+        },
+        "solo_4": {
+            "channel": 1,
+            "control": 11,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "solo_4",
+            "pitch": 11,
+            "value": 0.0
+        },
+        "solo_5": {
+            "channel": 1,
+            "control": 12,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "solo_5",
+            "pitch": 12,
+            "value": 0.0
+        },
+        "solo_6": {
+            "channel": 1,
+            "control": 13,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "solo_6",
+            "pitch": 13,
+            "value": 0.0
+        },
+        "solo_7": {
+            "channel": 1,
+            "control": 14,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "solo_7",
+            "pitch": 14,
+            "value": 0.0
+        },
+        "solo_8": {
+            "channel": 1,
+            "control": 15,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "solo_8",
+            "pitch": 15,
+            "value": 0.0
+        },
+        "stop": {
+            "channel": 1,
+            "control": 93,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "stop",
+            "pitch": 93,
+            "value": 0.0
+        },
+        "trans_down": {
+            "channel": 1,
+            "control": 91,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "trans_down",
+            "pitch": 91,
+            "value": 0.0
+        },
+        "trans_up": {
+            "channel": 1,
+            "control": 92,
+            "controlMessageType": 0,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "trans_up",
+            "pitch": 92,
+            "value": 0.0
+        },
+        "write": {
+            "channel": 1,
+            "control": 75,
+            "controlMessageType": 1,
+            "doFeedback": true,
+            "interfaceType": 2,
+            "name": "write",
+            "pitch": 75,
+            "value": 0.0
+        }
+    },
+    "midiIn": "",
+    "midiOut": ""
+}
