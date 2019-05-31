@@ -50,6 +50,9 @@ void ofApp::setup(){
     // gui.add(midiDevice.midiComponentGroups[name].parameterGroup);
     
 
+    // set a value
+    midiDevice.setComponentValue("fader_CC", 0.5);
+
 }
 
 //--------------------------------------------------------------
@@ -58,7 +61,7 @@ void ofApp::update(){
     midiDevice.update(); // to create feedback, if something in the program changes -> works with motorfader
     
     // access a value -> all values are normalized 0...1
-    float value = midiDevice.midiComponents["fader_CC"].value;
+    float value = midiDevice.getComponentValue("fader_CC");
 
 }
 
@@ -67,11 +70,16 @@ void ofApp::draw(){
     gui.draw();
     
     stringstream infoString;
-    for(auto & mC : midiDevice.midiComponents){
-        infoString << mC.second.name << " : " << mC.second.value << endl;
+    for(auto & mCG : midiDevice.midiComponentGroups){
+        infoString << mCG.second.name << endl;
+        infoString << "---" << endl;
+        for(auto & mC : mCG.second.midiComponents){
+            infoString << mC.second->name << " : " << mC.second->value << endl;
+        }
+        infoString << "---" << endl;
     }
     // or
-    // infoString << "midi_test_1 : " << midiDevice.midiComponents["midi_test_1"].value << endl;
+    // infoString << "fader_CC : " << midiDevice.getComponentValue("fader_CC") << endl;
 
     ofDrawBitmapString(infoString.str(), 220, 20);
     

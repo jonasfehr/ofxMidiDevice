@@ -58,6 +58,9 @@ public:
     
     void addMidiComponentGroup(MidiComponentGroup & midiComponentGroup);
     
+    float getComponentValue(string name);
+    void setComponentValue(string name, float value);
+    
     void setupPlatformM();
     
     void setupLaunchpad();

@@ -213,6 +213,15 @@ void ofxMidiDevice::addMidiComponentGroup(MidiComponentGroup & midiComponentGrou
     parameterGroup.add(midiComponentGroup.parameterGroup);
 }
 
+float ofxMidiDevice::getComponentValue(string name){
+    return midiComponents[name].value;
+}
+
+void ofxMidiDevice::setComponentValue(string name, float value){
+    midiComponents[name].value = value;
+}
+
+
 
 void ofxMidiDevice::setupPlatformM(){
     for(int i = 0; i < 8; i++){
