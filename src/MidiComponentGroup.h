@@ -19,6 +19,31 @@ public:
         }
     };
     
+    MidiComponentGroup(const MidiComponentGroup& other) {
+        this->name = other.name;
+        this->doCheckbox = other.doCheckbox;
+
+        // Copy each MidiComponent and add it to the group
+        for (const auto& midiComponent : other.midiComponents) {
+            MidiComponent* copiedComponent = new MidiComponent(*midiComponent.second);
+            this->add(*copiedComponent);
+        }
+    }
+    
+    MidiComponentGroup& operator=(const MidiComponentGroup& other) {
+        if (this != &other) {  // Check for self-assignment
+            this->name = other.name;
+            this->doCheckbox = other.doCheckbox;
+
+            // Copy each MidiComponent and add it to the group
+            for (const auto& midiComponent : other.midiComponents) {
+                MidiComponent* copiedComponent = new MidiComponent(*midiComponent.second);
+                this->add(*copiedComponent);
+            }
+        }
+        return *this;
+    }
+    
     map<string,MidiComponent*> midiComponents;
     bool doCheckbox = false;
     string name;

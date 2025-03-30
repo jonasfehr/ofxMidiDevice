@@ -62,7 +62,7 @@ public:
     void setComponentValue(string name, float value);
     
     void setupPlatformM();
-    
+    void setupFaderport16();
     void setupLaunchpad();
     
 };

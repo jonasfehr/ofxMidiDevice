@@ -29,11 +29,13 @@ void ofxMidiDevice::setup(string inputPortName, string outputPortName){
     
 //    //  SETUP FOR SPECIFIC PLATFORMS
 //    if(inputPortName == "Platform M+ V2.00"){
-        setupPlatformM();
+//       setupPlatformM();
 //    } else if(inputPortName == "Launchpad"){
 //        setupLaunchpad();
 //    }
     
+    setupFaderport16();
+
     gui.setup("MIDI in");
     gui.add(parameterGroup);
 }
@@ -297,6 +299,82 @@ void ofxMidiDevice::setupPlatformM(){
     
 }
 
+void ofxMidiDevice::setupFaderport16(){
+    for(int i = 0; i < 16; i++){
+        this->addFader("fader_"+ofToString(i+1),i+1,0,CMT_PITCH_BEND);
+        this->addButton("sel_"+ofToString(i+1), 1, i+24,CMT_NOTE_TOGGLE);
+        this->addButton("mute_"+ofToString(i+1), 1, i+16,CMT_NOTE_TOGGLE);
+        this->addButton("solo_"+ofToString(i+1), 1, i+8,CMT_NOTE_TOGGLE);
+    }
+    // Control section
+//    this->addFader("fader_M",9,0,CMT_PITCH_BEND);
+    
+    this->addButton("chan_down",1,46,CMT_NOTE);
+    this->addButton("chan_up",1,47,CMT_NOTE);
+    
+    this->addButton("bank_down",1,91,CMT_NOTE);
+    this->addButton("bank_up",1,92,CMT_NOTE);
+    
+    //this->addButton("trans_down",1,91,CMT_NOTE);
+    //this->addButton("trans_up",1,92,CMT_NOTE);
+    
+    
+    this->addButton("play",1,94,CMT_NOTE_TOGGLE);
+    this->addButton("stop",1,93,CMT_NOTE_TOGGLE);
+    this->addButton("rec",1,95,CMT_NOTE_TOGGLE);
+    this->addButton("rep",1,86,CMT_NOTE);
+    
+//    this->addButton("mixer",1,84,CMT_NOTE);
+    
+    this->addButton("read",1,83,CMT_NOTE_TOGGLE);
+    this->addButton("write",1,81,CMT_NOTE_TOGGLE);
+    
+    this->addKnob("jog",1,17,CMT_CONTROL_CHANGE_ENCODER);
+   // this->addKnob("pan",1,17,CMT_CONTROL_CHANGE_ENCODER);
+
+    MidiComponentGroup midiComponentGroup;
+    string name = "control_section";
+    midiComponentGroup.setup(name);
+//    midiComponentGroup.add(midiComponents["fader_M"]);
+    midiComponentGroup.add(midiComponents["chan_down"]);
+    midiComponentGroup.add(midiComponents["chan_up"]);
+//    midiComponentGroup.add(midiComponents["bank_down"]);
+//    midiComponentGroup.add(midiComponents["bank_up"]);
+    midiComponentGroup.add(midiComponents["trans_down"]);
+    midiComponentGroup.add(midiComponents["trans_up"]);
+    midiComponentGroup.add(midiComponents["play"]);
+    midiComponentGroup.add(midiComponents["stop"]);
+    midiComponentGroup.add(midiComponents["rec"]);
+    midiComponentGroup.add(midiComponents["rep"]);
+    midiComponentGroup.add(midiComponents["mixer"]);
+    midiComponentGroup.add(midiComponents["read"]);
+    midiComponentGroup.add(midiComponents["write"]);
+    midiComponentGroup.add(midiComponents["jog"]);
+    midiComponentGroups[name] = midiComponentGroup;
+    parameterGroup.add(midiComponentGroups[name].parameterGroup);
+    
+    
+    for(int i = 0; i < 16; i++){
+        string iStr = ofToString(i+1);
+        string name = "channel_"+iStr;
+        ChannelStrip channelStrip;
+        channelStrip.setup(name, midiComponents["fader_"+iStr], midiComponents["sel_"+iStr], midiComponents["mute_"+iStr], midiComponents["solo_"+iStr]);
+        channelStrips[name] = channelStrip;
+        parameterGroup.add(channelStrips[name].parameterGroup);
+        
+        
+        MidiComponentGroup midiComponentGroup;
+        midiComponentGroup.setup(name);
+        midiComponentGroup.add(midiComponents["fader_"+iStr]);
+        midiComponentGroup.add(midiComponents["sel_"+iStr]);
+        midiComponentGroup.add(midiComponents["mute_"+iStr]);
+        midiComponentGroup.add(midiComponents["solo_"+iStr]);
+        midiComponentGroups[name] = midiComponentGroup;
+        //                parameterGroup.add(midiComponentGroups[name].parameterGroup);
+    }
+    
+}
+
 void ofxMidiDevice::setupLaunchpad(){
     // SETUP CONTROL SECTION
     MidiComponentGroup midiComponentGroup;
@@ -353,11 +431,6 @@ void ofxMidiDevice::setupLaunchpad(){
     }
     midiComponentGroups[name] = midiComponentGroup;
     parameterGroup.add(midiComponentGroups[name].parameterGroup);
-    
-
-
-    
-
 }
 
 

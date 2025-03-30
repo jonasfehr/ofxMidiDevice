@@ -48,6 +48,49 @@ public:
     {
         value.removeListener(this, &MidiComponent::onValueChange);
     };
+    
+    MidiComponent(const MidiComponent &other) {
+        // Copy basic properties
+        this->midiIn = other.midiIn;
+        this->midiOut = other.midiOut;
+        this->value = other.value;
+        this->valueOld = other.valueOld;
+        this->doFeedback = other.doFeedback;
+        this->encoderStep = other.encoderStep;
+        this->interfaceType = other.interfaceType;
+        this->controlMessageType = other.controlMessageType;
+        this->channel = other.channel;
+        this->pitch = other.pitch;
+        this->control = other.control;
+        this->name = other.name;
+        this->message = other.message;
+
+        // Register the listener again for the new instance
+        this->value.addListener(this, &MidiComponent::onValueChange);
+    }
+    
+    MidiComponent& operator=(const MidiComponent& other) {
+        if (this != &other) {  // Check for self-assignment
+            // Copy basic properties
+            this->midiIn = other.midiIn;
+            this->midiOut = other.midiOut;
+            this->value = other.value;
+            this->valueOld = other.valueOld;
+            this->doFeedback = other.doFeedback;
+            this->encoderStep = other.encoderStep;
+            this->interfaceType = other.interfaceType;
+            this->controlMessageType = other.controlMessageType;
+            this->channel = other.channel;
+            this->pitch = other.pitch;
+            this->control = other.control;
+            this->name = other.name;
+            this->message = other.message;
+            
+            // Register the listener again for the new instance
+            this->value.addListener(this, &MidiComponent::onValueChange);
+        }
+        return *this;
+    }
 
     void setInterface(ofxMidiIn &midiIn, ofxMidiOut &midiOut)
     {

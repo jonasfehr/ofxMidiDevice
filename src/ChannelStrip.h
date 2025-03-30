@@ -41,6 +41,23 @@ public:
         parameterGroup.add(this->rec->value);
     };
     
+    void setup(string name, MidiComponent & fader, MidiComponent & sel, MidiComponent & mute, MidiComponent & solo){
+        this->name = name;
+        this->fader = &fader;
+        this->sel = &sel;
+        this->mute = &mute;
+        this->solo = &solo;
+        
+        this->knob = NULL;
+        this->rec = NULL;
+        
+        parameterGroup.setName(name);
+        parameterGroup.add(this->fader->value);
+        parameterGroup.add(this->sel->value);
+        parameterGroup.add(this->mute->value);
+        parameterGroup.add(this->solo->value);
+    };
+    
     MidiComponent* fader;
     MidiComponent* knob;
     MidiComponent* sel;
