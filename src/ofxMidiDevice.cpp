@@ -170,9 +170,9 @@ void ofxMidiDevice::addFader(string name, int channel, int controlChannel, int c
     midiComponent.channel = channel;
     midiComponent.control = controlChannel;
     midiComponent.name = name;
-    
+    midiComponent.value.setName(name);
+
     midiComponents[name] =  midiComponent;
-    midiComponents[name].value.setName(name);
 }
 
 void ofxMidiDevice::addKnob(string name, int channel, int control, int controlMessageType){
@@ -185,9 +185,9 @@ void ofxMidiDevice::addKnob(string name, int channel, int control, int controlMe
     midiComponent.control = control;
     midiComponent.value = 0;
     midiComponent.name = name;
-    
+    midiComponent.value.setName(name);
+
     midiComponents[name] =  midiComponent;
-    midiComponents[name].value.setName(name);
 }
 
 void ofxMidiDevice::addButton(string name, int channel, int controlChannel, int controlMessageType){
@@ -200,9 +200,9 @@ void ofxMidiDevice::addButton(string name, int channel, int controlChannel, int 
     midiComponent.control = controlChannel;
     midiComponent.pitch = controlChannel;
     midiComponent.name = name;
-    
+    midiComponent.value.setName(name);
+
     midiComponents[name] =  midiComponent;
-    midiComponents[name].value.setName(name);
 }
 
 void ofxMidiDevice::addButtonLP(string name, int channel, int controlChannel, int controlMessageType){
@@ -238,7 +238,7 @@ void ofxMidiDevice::setupPlatformM(){
         
     }
     // Control section
-    this->addFader("fader_M",9,0,CMT_PITCH_BEND);
+    this->addFader("fader_M_video",9,0,CMT_PITCH_BEND);
     this->addButton("chan_down",1,48,CMT_NOTE);
     this->addButton("chan_up",1,49,CMT_NOTE);
     this->addButton("bank_down",1,46,CMT_NOTE);
@@ -257,7 +257,7 @@ void ofxMidiDevice::setupPlatformM(){
     MidiComponentGroup midiComponentGroup;
     string name = "control_section";
     midiComponentGroup.setup(name);
-    midiComponentGroup.add(midiComponents["fader_M"]);
+    midiComponentGroup.add(midiComponents["fader_M_video"]);
     midiComponentGroup.add(midiComponents["chan_down"]);
     midiComponentGroup.add(midiComponents["chan_up"]);
     midiComponentGroup.add(midiComponents["bank_down"]);
@@ -300,14 +300,16 @@ void ofxMidiDevice::setupPlatformM(){
 }
 
 void ofxMidiDevice::setupFaderport16(){
-    for(int i = 0; i < 16; i++){
+    for(int i = 0; i < 14; i++){
         this->addFader("fader_"+ofToString(i+1),i+1,0,CMT_PITCH_BEND);
         this->addButton("sel_"+ofToString(i+1), 1, i+24,CMT_NOTE_TOGGLE);
         this->addButton("mute_"+ofToString(i+1), 1, i+16,CMT_NOTE_TOGGLE);
         this->addButton("solo_"+ofToString(i+1), 1, i+8,CMT_NOTE_TOGGLE);
     }
     // Control section
-//    this->addFader("fader_M",9,0,CMT_PITCH_BEND);
+    this->addFader("fader_M_video",16,0,CMT_PITCH_BEND);
+    this->addFader("fader_M_dmx",15,0,CMT_PITCH_BEND);
+    this->addFader("fader_Speed",14,0,CMT_PITCH_BEND);
     
     this->addButton("chan_down",1,46,CMT_NOTE);
     this->addButton("chan_up",1,47,CMT_NOTE);
@@ -335,7 +337,9 @@ void ofxMidiDevice::setupFaderport16(){
     MidiComponentGroup midiComponentGroup;
     string name = "control_section";
     midiComponentGroup.setup(name);
-//    midiComponentGroup.add(midiComponents["fader_M"]);
+    midiComponentGroup.add(midiComponents["fader_M_video"]);
+    midiComponentGroup.add(midiComponents["fader_M_dmx"]);
+    midiComponentGroup.add(midiComponents["fader_Speed"]);
     midiComponentGroup.add(midiComponents["chan_down"]);
     midiComponentGroup.add(midiComponents["chan_up"]);
 //    midiComponentGroup.add(midiComponents["bank_down"]);
@@ -354,7 +358,7 @@ void ofxMidiDevice::setupFaderport16(){
     parameterGroup.add(midiComponentGroups[name].parameterGroup);
     
     
-    for(int i = 0; i < 16; i++){
+    for(int i = 0; i < 14; i++){
         string iStr = ofToString(i+1);
         string name = "channel_"+iStr;
         ChannelStrip channelStrip;

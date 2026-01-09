@@ -60,6 +60,7 @@ public:
     
     void add(MidiComponent & midiComponent){
         midiComponents[midiComponent.name] = &midiComponent;
+        parameterGroup.setName(midiComponent.name);
         parameterGroup.add(this->midiComponents[midiComponent.name]->value);
         ofAddListener(midiComponent.changedE, this, &MidiComponentGroup::groupChange);
     }
