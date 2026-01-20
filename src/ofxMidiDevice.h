@@ -14,6 +14,7 @@
 #include "ChannelStrip.h"
 #include "ofxGui.h"
 #include <unordered_map>
+#include "DeviceProfile.h"
 
 class ofxMidiDevice : public ofxMidiListener{
 public:
@@ -30,7 +31,7 @@ public:
 	ofxPanel gui;
 	ofParameterGroup parameterGroup;
 	
-	
+	std::unordered_map<std::string, std::string> bindings; // role -> component label
 	
 	ofxMidiDevice();
 	~ofxMidiDevice();
@@ -38,6 +39,8 @@ public:
 	void setup(string inputPortName, string outputPortName);
 	
 	void setupFromFile(string filename);
+	
+	void setupFromProfile(const DeviceProfile &profile);
 	
 	void update();
 	
@@ -62,9 +65,5 @@ public:
 	float getComponentValue(string name);
 	void setComponentValue(string name, float value);
 	bool hasComponent(const std::string &name) const { return midiComponents.find(name) != midiComponents.end(); }
-	
-	void setupPlatformM();
-	void setupFaderport16();
-	void setupLaunchpad();
 	
 };
