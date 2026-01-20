@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include "ChannelStrip.h"
 #include "Defines.h"
 #include "DeviceProfile.h"
 #include "MidiComponent.h"
@@ -20,7 +19,6 @@ class ofxMidiDevice : public ofxMidiListener {
 public:
 	std::unordered_map<std::string, MidiComponent> midiComponents;
 	std::unordered_map<std::string, MidiComponentGroup> midiComponentGroups;
-	std::unordered_map<std::string, ChannelStrip> channelStrips;
 	ofxMidiIn midiIn;
 	ofxMidiOut midiOut;
 

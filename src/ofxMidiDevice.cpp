@@ -87,7 +87,6 @@ void ofxMidiDevice::setupFromFile(string filename) {
 void ofxMidiDevice::setupFromProfile(const DeviceProfile & profile) {
 	midiComponents.clear();
 	midiComponentGroups.clear();
-	channelStrips.clear();
 	bindings = profile.bindings;
 
 	setup(profile.midiInPort, profile.midiOutPort);
