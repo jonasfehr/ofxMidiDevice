@@ -21,10 +21,10 @@ struct DeviceProfile {
 	int channelsPerPage = 8;
 	bool perParameterButtons = false;
 	std::unordered_map<std::string, ControlComponent> components; // label -> component
-	std::unordered_map<std::string, std::string> bindings;        // role -> label
+	std::unordered_map<std::string, std::string> bindings; // role -> label
 };
 
-inline ControlMessageTypes parseCmt(const std::string &s) {
+inline ControlMessageTypes parseCmt(const std::string & s) {
 	if (s == "note") return CMT_NOTE;
 	if (s == "note_toggle") return CMT_NOTE_TOGGLE;
 	if (s == "pitch_bend") return CMT_PITCH_BEND;
@@ -33,7 +33,7 @@ inline ControlMessageTypes parseCmt(const std::string &s) {
 	return CMT_CONTROL_CHANGE;
 }
 
-inline InterfaceTypes parseIT(const std::string &s) {
+inline InterfaceTypes parseIT(const std::string & s) {
 	if (s == "IT_FADER" || s == "fader") return IT_FADER;
 	if (s == "IT_KNOB" || s == "knob" || s == "encoder") return IT_KNOB;
 	if (s == "IT_BUTTON_LP" || s == "button_lp" || s == "buttonLP") return IT_BUTTON_LP;
@@ -41,13 +41,13 @@ inline InterfaceTypes parseIT(const std::string &s) {
 	return IT_BUTTON;
 }
 
-inline std::optional<std::vector<DeviceProfile>> loadDeviceProfiles(const std::string &path) {
+inline std::optional<std::vector<DeviceProfile>> loadDeviceProfiles(const std::string & path) {
 	if (!ofFile::doesFileExist(path)) return std::nullopt;
 	auto json = ofLoadJson(path);
 	if (!json.is_array()) return std::nullopt;
 
 	std::vector<DeviceProfile> profiles;
-	for (auto &node : json) {
+	for (auto & node : json) {
 		DeviceProfile p;
 		p.name = node.value("name", "");
 		p.midiInPort = node.value("midiInPort", "");
@@ -56,7 +56,7 @@ inline std::optional<std::vector<DeviceProfile>> loadDeviceProfiles(const std::s
 		p.perParameterButtons = node.value("perParameterButtons", false);
 
 		if (node.contains("components") && node["components"].is_array()) {
-			for (auto &c : node["components"]) {
+			for (auto & c : node["components"]) {
 				ControlComponent comp;
 				comp.label = c.value("label", "");
 				comp.channel = c.value("channel", 1);
