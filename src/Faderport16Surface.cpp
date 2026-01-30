@@ -68,6 +68,29 @@ void Faderport16Surface::setupSurface(const std::string& inputPort, const std::s
 	gui.add(parameterGroup);
 }
 
+void Faderport16Surface::onProfileLoaded(const DeviceProfile& /*profile*/){
+	// Clear displays and set static labels when using profile-driven setup.
+	for(int ch = 0; ch < 16; ++ch) setDisplayMode(ch, true);
+	auto sendLabel = [&](int channel, const std::string& s){
+		std::vector<unsigned char> text;
+		text.push_back(0xF0);
+		text.push_back(0x00);
+		text.push_back(0x01);
+		text.push_back(0x06);
+		text.push_back(0x16);
+		text.push_back(0x12);
+		text.push_back(channel);
+		text.push_back(0x00);
+		text.push_back(0x01);
+		std::copy(s.begin(), s.end(), std::back_inserter(text));
+		text.push_back(0xF7);
+		midiOut.sendMidiBytes(text);
+	};
+	sendLabel(13, "SPD.");
+	sendLabel(14, "DMX");
+	sendLabel(15, "VID.");
+}
+
 void Faderport16Surface::setDisplayMode(int channel, bool clear){
 	std::vector<unsigned char> text;
 	text.push_back(0xF0);

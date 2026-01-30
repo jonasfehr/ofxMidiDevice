@@ -5,6 +5,7 @@
 class LaunchpadSurface : public MidiControlSurface {
 public:
 	void setupSurface(const std::string& inputPort, const std::string& outputPort) override;
+	void onProfileLoaded(const DeviceProfile& profile) override;
 	void updatePageDisplay(const std::string& pageTitle) override;
 	void updateParameterDisplay(const std::vector<std::string>& parameterLabels,
 							   const std::vector<float>& parameterValues) override;

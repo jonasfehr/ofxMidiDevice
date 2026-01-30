@@ -127,3 +127,7 @@ void PlatformMSurface::updateParameterDisplay(const std::vector<std::string>& pa
 	text.push_back(0xF7);// DETERMINATOR
 	midiOut.sendMidiBytes(text);
 }
+
+void PlatformMSurface::onProfileLoaded(const DeviceProfile& /*profile*/){
+	// No special display init required for Platform M; displays update via SYSEX in page/parameter methods.
+}
