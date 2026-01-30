@@ -53,10 +53,6 @@ void Faderport16Surface::setupSurface(const std::string& inputPort, const std::s
 	for(int i = 0; i < 14; i++){
 		string iStr = ofToString(i+1);
 		string name = "channel_"+iStr;
-		ChannelStrip channelStrip;
-		channelStrip.setup(name, midiComponents["fader_"+iStr], midiComponents["sel_"+iStr], midiComponents["mute_"+iStr], midiComponents["solo_"+iStr]);
-		channelStrips[name] = channelStrip;
-		parameterGroup.add(channelStrips[name].parameterGroup);
 		
 		MidiComponentGroup midiComponentGroup;
 		midiComponentGroup.setup(name);

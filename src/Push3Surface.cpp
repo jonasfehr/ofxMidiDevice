@@ -110,7 +110,11 @@ void Push3Surface::setupSurface(const std::string& inputPort, const std::string&
 	gui.add(parameterGroup);
 
 	display = std::make_unique<PushDisplayTransport>(displayVid, displayPid, displayInterface, displayAlt, displayEndpoint);
-	display->open();
+	if (!display->open()) {
+		ofLogError("Push3Surface") << "Display open failed (vid=0x" << std::hex << displayVid
+								 << " pid=0x" << displayPid << std::dec << ", iface=" << int(displayInterface)
+								 << " alt=" << int(displayAlt) << " ep=0x" << std::hex << int(displayEndpoint) << std::dec;
+	}
 
 	// Enable mapping monitor to discover button/encoder messages.
 	attachMonitor(true);
@@ -125,10 +129,33 @@ void Push3Surface::updatePageDisplay(const std::string& pageTitle) {
 }
 
 void Push3Surface::updateParameterDisplay(const std::vector<std::string>& parameterLabels,
-										 const std::vector<float>& parameterValues) {
+									 const std::vector<float>& parameterValues) {
 	lastLabels = parameterLabels;
 	lastValues = parameterValues;
-	sendFrame(lastTitle, parameterLabels, parameterValues);
+	if (!lastTitle.empty()) {
+		sendFrame(lastTitle, parameterLabels, parameterValues);
+	}
+}
+
+void Push3Surface::onProfileLoaded(const DeviceProfile& /*profile*/)
+{
+	if (!display) {
+		display = std::make_unique<PushDisplayTransport>(displayVid, displayPid, displayInterface, displayAlt, displayEndpoint);
+	}
+	if (!display->isOpen()) {
+		if (!display->open()) {
+			ofLogError("Push3Surface") << "Display open failed (profile)";
+			return;
+		}
+	}
+
+	ofRemoveListener(ofEvents().update, this, &Push3Surface::onUpdate);
+	ofAddListener(ofEvents().update, this, &Push3Surface::onUpdate);
+
+	attachMonitor(true);
+	
+	attachMonitor(false);
+	lastFrameMillis = 0;
 }
 
 void Push3Surface::blitChar(std::vector<uint16_t>& buf, int x, int y, char c, uint16_t color) {
@@ -164,11 +191,8 @@ void Push3Surface::blitCharScaled(std::vector<uint16_t>& buf, int x, int y, char
 }
 
 void Push3Surface::sendFrame(const std::string& title, const std::vector<std::string>& labels, const std::vector<float>& values) {
-	ofLogNotice("Push3Surface") << "sendFrame title=" << title << " labels=" << labels.size();
-	if (!display || !display->isOpen()) {
-		ofLogError("Push3Surface") << "sendFrame called but display not open";
-		return;
-	}
+	// no per-frame logging; no reopen attempts here
+	if (!display || !display->isOpen()) return;
 	lastFrameMillis = ofGetElapsedTimeMillis();
 
 	std::vector<uint16_t> pixels(kWidth * kHeight, 0x0000);
@@ -182,7 +206,9 @@ void Push3Surface::sendFrame(const std::string& title, const std::vector<std::st
 	};
 
 	// Title in double size
-	drawTextScaled(8, kTitleY, title.substr(0, 30), 2);
+	if (!title.empty()) {
+		drawTextScaled(8, kTitleY, title.substr(0, 30), 2);
+	}
 
 	// Parameters: one row, 8 equal slots across the width
 	int cols = 8;
@@ -232,8 +258,8 @@ void Push3Surface::sendFrame(const std::string& title, const std::vector<std::st
 	static const uint8_t xorMask[4] = {0xE7, 0xF3, 0xE7, 0xFF};
 	const int rowBytes = kWidth * 2;
 	std::vector<uint8_t> rowBuf(kStrideBytes, 0);
-
 	for(int y=0; y<kHeight; ++y){
+		std::fill(rowBuf.begin(), rowBuf.end(), 0); // clear 128 padding bytes per line
 		const uint16_t* row = &pixels[y * kWidth];
 		uint8_t* dst = rowBuf.data();
 		for(int x=0; x<kWidth; ++x){
@@ -280,9 +306,12 @@ void Push3Surface::attachMonitor(bool enable)
 	}
 }
 
-void Push3Surface::onUpdate(ofEventArgs&){
-	uint64_t now = ofGetElapsedTimeMillis();
-	if(now - lastFrameMillis >= 1000){
-		sendFrame(lastTitle, lastLabels, lastValues);
-	}
+void Push3Surface::onUpdate(ofEventArgs&)
+{
+	// Keep alive at ~1Hz, don't reopen from update
+	const uint64_t now = ofGetElapsedTimeMillis();
+	if (now - lastFrameMillis < 1000) return;
+	if (!display || !display->isOpen()) return;
+	if (lastTitle.empty()) return;
+	sendFrame(lastTitle, lastLabels, lastValues);
 }

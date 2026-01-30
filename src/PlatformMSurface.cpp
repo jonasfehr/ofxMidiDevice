@@ -58,11 +58,6 @@ void PlatformMSurface::setupSurface(const std::string& inputPort, const std::str
 	for(int i = 0; i < 8; i++){
 		string iStr = ofToString(i+1);
 		string name = "channel_"+iStr;
-		ChannelStrip channelStrip;
-		channelStrip.setup(name, midiComponents["fader_"+iStr], midiComponents["knob_"+iStr], midiComponents["sel_"+iStr], midiComponents["mute_"+iStr], midiComponents["solo_"+iStr], midiComponents["rec_"+iStr]);
-		channelStrips[name] = channelStrip;
-		parameterGroup.add(channelStrips[name].parameterGroup);
-		
 		
 		MidiComponentGroup midiComponentGroup;
 		midiComponentGroup.setup(name);

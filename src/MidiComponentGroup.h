@@ -44,16 +44,16 @@ public:
         return *this;
     }
     
-    map<string,MidiComponent*> midiComponents;
+	std::map<std::string,MidiComponent*> midiComponents;
     bool doCheckbox = false;
-    string name;
+	std::string name;
     ofParameterGroup parameterGroup;
     
-    ofEvent<string> lastChangedE;
+	ofEvent<std::string> lastChangedE;
     
     ofEvent<float> noneSelectedE;
 
-    void setup(string name){
+	void setup(std::string name){
         this->name = name;
         parameterGroup.setName(this->name);
     }
@@ -74,7 +74,7 @@ public:
     //        cout << parameter << endl;
     //    }
     
-    void groupChange(string &name){
+	void groupChange(std::string &name){
         // CHECKBOX
         if(doCheckbox){
             for(auto & midiComponent : midiComponents){

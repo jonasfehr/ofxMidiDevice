@@ -59,7 +59,7 @@ bool PushDisplayTransport::sendFrame(const std::vector<uint8_t>& frame) {
 	int transferred = 0;
 	int r = libusb_bulk_transfer(handle_, bulkOutEndpoint_,
 								 const_cast<unsigned char*>(frame.data()),
-								 static_cast<int>(frame.size()), &transferred, 1000);
+								 static_cast<int>(frame.size()), &transferred, 100);
 	if (r != 0 || transferred != static_cast<int>(frame.size())) {
 		std::cerr << "PushDisplayTransport: bulk_transfer failed r=" << r << " transferred=" << transferred << " of " << frame.size() << std::endl;
 		return false;
@@ -72,7 +72,7 @@ bool PushDisplayTransport::sendBuffer(const uint8_t* data, size_t size) {
 	int transferred = 0;
 	int r = libusb_bulk_transfer(handle_, bulkOutEndpoint_,
 								 const_cast<unsigned char*>(data),
-								 static_cast<int>(size), &transferred, 1000);
+								 static_cast<int>(size), &transferred, 100);
 	if (r != 0 || transferred != static_cast<int>(size)) {
 		std::cerr << "PushDisplayTransport: bulk_transfer failed r=" << r << " transferred=" << transferred << " of " << size << std::endl;
 		return false;

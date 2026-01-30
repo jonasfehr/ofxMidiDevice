@@ -33,11 +33,11 @@ public:
 	int pitch = 0;
 	int control = 0;
 
-	string name;
+	std::string name;
 
-	ofEvent<string> changedE;
+	ofEvent<std::string> changedE;
 
-	vector<unsigned char> message;
+	std::vector<unsigned char> message;
 
 	MidiComponent()
 	{
