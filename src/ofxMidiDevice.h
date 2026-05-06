@@ -4,6 +4,9 @@
 //  Created by Jonas Fehr on 27/03/2018.
 //
 
+#ifndef OFX_MIDI_DEVICE_H
+#define OFX_MIDI_DEVICE_H
+
 #pragma once
 
 #include "Defines.h"
@@ -14,7 +17,6 @@
 #include "ofxGui.h"
 #include "ofxMidi.h"
 #include <unordered_map>
-
 class ofxMidiDevice : public ofxMidiListener {
 public:
 	std::unordered_map<std::string, MidiComponent> midiComponents;
@@ -61,3 +63,4 @@ public:
 	void setComponentValue(string name, float value);
 	bool hasComponent(const std::string & name) const { return midiComponents.find(name) != midiComponents.end(); }
 };
+#endif

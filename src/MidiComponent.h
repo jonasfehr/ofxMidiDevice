@@ -8,6 +8,7 @@
 #ifndef MidiComponent_h
 #define MidiComponent_h
 
+#include "ofMain.h"
 #include "ofxMidi.h"
 #include "Defines.h"
 
@@ -201,8 +202,6 @@ public:
 				break;
 			}
 		}
-
-		return;
 	}
 
 	void update()

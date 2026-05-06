@@ -1,6 +1,35 @@
 #include "Push3Surface.h"
 #include "ofMain.h"
 #include <cctype>
+#include <utility>
+
+namespace {
+	constexpr unsigned char kPaletteOff = 0;
+	constexpr unsigned char kPaletteDim = 1;
+	constexpr unsigned char kPaletteWhite = 2;
+	constexpr unsigned char kPaletteGreen = 3;
+	constexpr unsigned char kPaletteGreenBright = 4;
+	constexpr unsigned char kPaletteAmber = 5;
+	constexpr unsigned char kPaletteAmberBright = 6;
+	constexpr unsigned char kPaletteBlue = 7;
+	constexpr unsigned char kPaletteBlueBright = 8;
+	constexpr unsigned char kPaletteCyan = 9;
+	constexpr unsigned char kPaletteLime = 10;
+	constexpr unsigned char kPaletteYellow = 11;
+	constexpr unsigned char kPaletteRed = 12;
+
+	uint32_t packColor(const ofColor& color) {
+		return (static_cast<uint32_t>(color.r) << 16)
+			| (static_cast<uint32_t>(color.g) << 8)
+			| static_cast<uint32_t>(color.b);
+	}
+}
+
+std::string Push3Surface::gridLabel(int row, int col) const
+{
+	if (gridProfile) return gridProfile->componentLabel(row, col);
+	return "button_r_" + ofToString(row) + "_c_" + ofToString(col);
+}
 
 // Minimal 5x7 glyphs (columns, top bit = row0)
 static const uint8_t GLYPH_SPACE[5] = {0,0,0,0,0};
@@ -59,6 +88,8 @@ void Push3Surface::setupSurface(const std::string& inputPort, const std::string&
 {
 	setup(inputPort, outputPort);
 	parameterGroup.setName(inputPort);
+	enterUserMode();
+	initPalette();
 
 	// Top-row encoders (relative two's complement deltas)
 	for (size_t i = 0; i < kKnobCCs.size(); ++i)
@@ -123,9 +154,219 @@ void Push3Surface::setupSurface(const std::string& inputPort, const std::string&
 	ofAddListener(ofEvents().update, this, &Push3Surface::onUpdate);
 }
 
+void Push3Surface::sendSysEx(const std::vector<unsigned char>& payload)
+{
+	if (!midiOut.isOpen()) return;
+
+	std::vector<unsigned char> message;
+	message.reserve(payload.size() + 8);
+	message.push_back(0xF0);
+	message.push_back(0x00);
+	message.push_back(0x21);
+	message.push_back(0x1D);
+	message.push_back(0x01);
+	message.push_back(0x01);
+	message.insert(message.end(), payload.begin(), payload.end());
+	message.push_back(0xF7);
+	midiOut.sendMidiBytes(message);
+}
+
+void Push3Surface::enterUserMode()
+{
+	sendSysEx({0x0A, 0x01});
+}
+
+void Push3Surface::writePaletteEntry(unsigned char index, unsigned char r, unsigned char g, unsigned char b, unsigned char w)
+{
+	auto split = [](unsigned char value) -> std::array<unsigned char, 2> {
+		return {static_cast<unsigned char>(value & 0x7F), static_cast<unsigned char>((value >> 7) & 0x7F)};
+	};
+
+	auto rs = split(r);
+	auto gs = split(g);
+	auto bs = split(b);
+	auto ws = split(w);
+	sendSysEx({0x03, index, rs[0], rs[1], gs[0], gs[1], bs[0], bs[1], ws[0], ws[1]});
+}
+
+void Push3Surface::reapplyPalette()
+{
+	sendSysEx({0x05});
+}
+
+void Push3Surface::initPalette()
+{
+	if (paletteInitialized || !midiOut.isOpen()) return;
+
+	writePaletteEntry(kPaletteDim, 24, 24, 24);
+	writePaletteEntry(kPaletteWhite, 220, 220, 220);
+	writePaletteEntry(kPaletteGreen, 0, 84, 18);
+	writePaletteEntry(kPaletteGreenBright, 32, 255, 96);
+	writePaletteEntry(kPaletteAmber, 110, 48, 0);
+	writePaletteEntry(kPaletteAmberBright, 255, 140, 0);
+	writePaletteEntry(kPaletteBlue, 0, 56, 128);
+	writePaletteEntry(kPaletteBlueBright, 0, 168, 255);
+	writePaletteEntry(kPaletteCyan, 0, 216, 196);
+	writePaletteEntry(kPaletteLime, 110, 255, 0);
+	writePaletteEntry(kPaletteYellow, 255, 220, 0);
+	writePaletteEntry(kPaletteRed, 255, 48, 0);
+	reapplyPalette();
+	paletteInitialized = true;
+	lastPadPalette.fill(255);
+	lastCueColors.fill(0xFFFFFFFFu);
+}
+
+void Push3Surface::disableManagedPadFeedback()
+{
+	for (int row = 0; row < kGridRows; ++row) {
+		for (int col = 0; col < kGridCols; ++col) {
+			auto it = midiComponents.find(gridLabel(row, col));
+			if (it != midiComponents.end()) {
+				it->second.doFeedback = false;
+			}
+		}
+	}
+}
+
+void Push3Surface::unbindGridInput()
+{
+	for (const auto& label : gridListenerLabels) {
+		auto it = midiComponents.find(label);
+		if (it != midiComponents.end()) {
+			ofRemoveListener(it->second.changedE, this, &Push3Surface::onGridPadTriggered);
+		}
+	}
+	gridListenerLabels.clear();
+}
+
+void Push3Surface::bindGridInput()
+{
+	unbindGridInput();
+	for (int row = 0; row < kGridRows; ++row) {
+		for (int col = 0; col < kGridCols; ++col) {
+			auto label = gridLabel(row, col);
+			auto it = midiComponents.find(label);
+			if (it == midiComponents.end()) continue;
+			ofAddListener(it->second.changedE, this, &Push3Surface::onGridPadTriggered);
+			gridListenerLabels.push_back(label);
+		}
+	}
+}
+
+void Push3Surface::onGridPadTriggered(std::string& name)
+{
+	if (!cueGridEnabled || !gridTriggerHandler) return;
+	auto componentIt = midiComponents.find(name);
+	if (componentIt == midiComponents.end()) return;
+	if (componentIt->second.value.get() < 0.5f) return;
+	auto cellIt = gridCellsByLabel.find(name);
+	if (cellIt == gridCellsByLabel.end()) return;
+	gridTriggerHandler(cellIt->second);
+}
+
+void Push3Surface::updatePadGrid()
+{
+	if (!paletteInitialized || !midiOut.isOpen()) return;
+
+	std::array<unsigned char, kGridCols * kGridRows> desired{};
+	desired.fill(kPaletteOff);
+
+	if (cueGridEnabled) {
+		for (const auto& cue : timelineGridState.cells) {
+			if (!cue.isValid()) continue;
+			auto index = cue.row * kGridCols + cue.column;
+			desired[index] = static_cast<unsigned char>(kCuePaletteBase + index);
+		}
+
+		for (int row = 0; row < kGridRows; ++row) {
+			for (int col = 0; col < kGridCols; ++col) {
+				auto index = row * kGridCols + col;
+				if (desired[index] == lastPadPalette[index]) continue;
+				midiOut.sendNoteOn(1, kPadBaseNote + index, desired[index]);
+				lastPadPalette[index] = desired[index];
+			}
+		}
+		return;
+	}
+
+	auto noteFor = [](int row, int col) {
+		return kPadBaseNote + row * kGridCols + col;
+	};
+	auto indexFor = [](int row, int col) {
+		return row * kGridCols + col;
+	};
+	const std::array<unsigned char, kMeterRows> meterColors{
+		kPaletteCyan,
+		kPaletteLime,
+		kPaletteYellow,
+		kPaletteAmberBright,
+		kPaletteRed,
+	};
+
+	for (int col = 0; col < kGridCols; ++col) {
+		bool hasSlot = col < static_cast<int>(lastLabels.size()) && !lastLabels[col].empty();
+		if (!hasSlot) continue;
+
+		float value = col < static_cast<int>(lastValues.size()) ? ofClamp(lastValues[col], 0.f, 1.f) : 0.f;
+		int filledRows = static_cast<int>(std::ceil(value * kMeterRows));
+		for (int row = 0; row < kMeterRows; ++row) {
+			int gridRow = kActionRows + row;
+			if (row < filledRows) {
+				desired[indexFor(gridRow, col)] = meterColors[row];
+			} else if (value > 0.f) {
+				desired[indexFor(gridRow, col)] = kPaletteDim;
+			}
+		}
+	}
+
+	for (int row = 0; row < kGridRows; ++row) {
+		for (int col = 0; col < kGridCols; ++col) {
+			auto index = indexFor(row, col);
+			if (desired[index] == lastPadPalette[index]) continue;
+			midiOut.sendNoteOn(1, noteFor(row, col), desired[index]);
+			lastPadPalette[index] = desired[index];
+		}
+	}
+}
+
+void Push3Surface::setGridTriggerHandler(GridTriggerHandler handler)
+{
+	gridTriggerHandler = std::move(handler);
+}
+
+void Push3Surface::updateTimelineGrid(const TimelineGridState& state) {
+	timelineGridState = state;
+	gridCellsByLabel.clear();
+	for (const auto& cue : timelineGridState.cells) {
+		if (!cue.isValid()) continue;
+		gridCellsByLabel[gridLabel(cue.row, cue.column)] = cue;
+	}
+	cueGridEnabled = !timelineGridState.empty();
+
+	if (paletteInitialized && midiOut.isOpen()) {
+		bool paletteChanged = false;
+		std::array<uint32_t, kGridCols * kGridRows> desiredCueColors{};
+		desiredCueColors.fill(0xFFFFFFFFu);
+
+		for (const auto& cue : timelineGridState.cells) {
+			auto index = cue.row * kGridCols + cue.column;
+			desiredCueColors[index] = packColor(cue.color);
+			if (desiredCueColors[index] == lastCueColors[index]) continue;
+			writePaletteEntry(static_cast<unsigned char>(kCuePaletteBase + index), cue.color.r, cue.color.g, cue.color.b);
+			lastCueColors[index] = desiredCueColors[index];
+			paletteChanged = true;
+		}
+
+		if (paletteChanged) reapplyPalette();
+	}
+
+	updatePadGrid();
+}
+
 void Push3Surface::updatePageDisplay(const std::string& pageTitle) {
 	lastTitle = pageTitle;
 	sendFrame(pageTitle, lastLabels, lastValues);
+	updatePadGrid();
 }
 
 void Push3Surface::updateParameterDisplay(const std::vector<std::string>& parameterLabels,
@@ -135,10 +376,18 @@ void Push3Surface::updateParameterDisplay(const std::vector<std::string>& parame
 	if (!lastTitle.empty()) {
 		sendFrame(lastTitle, parameterLabels, parameterValues);
 	}
+	updatePadGrid();
 }
 
-void Push3Surface::onProfileLoaded(const DeviceProfile& /*profile*/)
+void Push3Surface::onProfileLoaded(const DeviceProfile& profile)
 {
+	gridProfile = profile.grid;
+	enterUserMode();
+	initPalette();
+	disableManagedPadFeedback();
+	bindGridInput();
+	updatePadGrid();
+
 	if (!display) {
 		display = std::make_unique<PushDisplayTransport>(displayVid, displayPid, displayInterface, displayAlt, displayEndpoint);
 	}
@@ -156,6 +405,7 @@ void Push3Surface::onProfileLoaded(const DeviceProfile& /*profile*/)
 	
 	attachMonitor(false);
 	lastFrameMillis = 0;
+	lastCueColors.fill(0xFFFFFFFFu);
 }
 
 void Push3Surface::blitChar(std::vector<uint16_t>& buf, int x, int y, char c, uint16_t color) {

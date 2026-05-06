@@ -14,6 +14,30 @@ struct ControlComponent {
 	InterfaceTypes interfaceType = IT_BUTTON; // fader, knob, button, encoder, display
 };
 
+struct GridComponentProfile {
+	int rows = 0;
+	int cols = 0;
+	// If true, incoming timeline row 0 (top) is flipped to grid bottom-origin.
+	bool flipTopOrigin = true;
+	int channel = 1;
+	int baseAddress = 0;
+	ControlMessageTypes type = CMT_NOTE;
+	InterfaceTypes interfaceType = IT_BUTTON;
+	std::string labelPrefix = "button";
+
+	bool isValid() const {
+		return rows > 0 && cols > 0 && !labelPrefix.empty();
+	}
+
+	std::string componentLabel(int row, int col) const {
+		return labelPrefix + "_r_" + std::to_string(row) + "_c_" + std::to_string(col);
+	}
+
+	int addressFor(int row, int col) const {
+		return baseAddress + row * cols + col;
+	}
+};
+
 struct DeviceProfile {
 	std::string name;
 	std::string midiInPort;
@@ -22,6 +46,7 @@ struct DeviceProfile {
 	bool perParameterButtons = false;
 	std::unordered_map<std::string, ControlComponent> components; // label -> component
 	std::unordered_map<std::string, std::string> bindings; // role -> label
+	std::optional<GridComponentProfile> grid;
 };
 
 inline ControlMessageTypes parseCmt(const std::string & s) {
@@ -64,6 +89,22 @@ inline std::optional<std::vector<DeviceProfile>> loadDeviceProfiles(const std::s
 				comp.type = parseCmt(c.value("type", "cc"));
 				comp.interfaceType = parseIT(c.value("interfaceType", ""));
 				if (!comp.label.empty()) p.components[comp.label] = comp;
+			}
+		}
+
+		if (node.contains("grid") && node["grid"].is_object()) {
+			GridComponentProfile grid;
+			auto & g = node["grid"];
+			grid.rows = g.value("rows", 0);
+			grid.cols = g.value("cols", 0);
+			grid.flipTopOrigin = g.value("flipTopOrigin", true);
+			grid.channel = g.value("channel", 1);
+			grid.baseAddress = g.value("baseAddress", 0);
+			grid.type = parseCmt(g.value("type", "note"));
+			grid.interfaceType = parseIT(g.value("interfaceType", "button"));
+			grid.labelPrefix = g.value("labelPrefix", "button");
+			if (grid.isValid()) {
+				p.grid = grid;
 			}
 		}
 

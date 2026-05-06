@@ -105,6 +105,20 @@ void ofxMidiDevice::setupFromProfile(const DeviceProfile & profile) {
 		addComponent(kv.second);
 	}
 
+	if (profile.grid) {
+		for (int row = 0; row < profile.grid->rows; ++row) {
+			for (int col = 0; col < profile.grid->cols; ++col) {
+				ControlComponent comp;
+				comp.label = profile.grid->componentLabel(row, col);
+				comp.channel = profile.grid->channel;
+				comp.address = profile.grid->addressFor(row, col);
+				comp.type = profile.grid->type;
+				comp.interfaceType = profile.grid->interfaceType;
+				addComponent(comp);
+			}
+		}
+	}
+
 	parameterGroup.clear();
 	for (auto & c : midiComponents) {
 		c.second.value.setName(c.second.name);
@@ -124,7 +138,6 @@ void ofxMidiDevice::saveMidiComponentsToFile(string filename) {
 	ofJson deviceSetup; // = ofLoadJson(filename);
 	deviceSetup["midiIn"] = midiIn.getName();
 	deviceSetup["midiOut"] = midiOut.getName();
-	int i = 0;
 	for (auto & c : midiComponents) {
 		string name = c.second.name;
 		deviceSetup["midiComponents"][name]["interfaceType"] = c.second.interfaceType;
@@ -135,7 +148,6 @@ void ofxMidiDevice::saveMidiComponentsToFile(string filename) {
 		deviceSetup["midiComponents"][name]["control"] = c.second.control;
 		deviceSetup["midiComponents"][name]["value"] = (float)c.second.value;
 		deviceSetup["midiComponents"][name]["name"] = c.second.name;
-		i++;
 	}
 
 	ofSavePrettyJson(filename, deviceSetup);
