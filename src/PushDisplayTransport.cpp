@@ -1,6 +1,19 @@
 #include "PushDisplayTransport.h"
 #include <iostream>
 
+namespace {
+bool hasBulkOutEndpoint(const libusb_interface_descriptor& desc, uint8_t endpoint) {
+	for (int i = 0; i < desc.bNumEndpoints; ++i) {
+		const auto& ep = desc.endpoint[i];
+		if ((ep.bEndpointAddress & LIBUSB_ENDPOINT_DIR_MASK) == LIBUSB_ENDPOINT_OUT &&
+			ep.bEndpointAddress == endpoint) {
+			return true;
+		}
+	}
+	return false;
+}
+}
+
 PushDisplayTransport::PushDisplayTransport(uint16_t vid, uint16_t pid,
 										   uint8_t interfaceNumber, uint8_t altSetting,
 										   uint8_t bulkOutEndpoint)
@@ -24,15 +37,41 @@ bool PushDisplayTransport::open() {
 		std::cerr << "PushDisplayTransport: open_device failed vid=0x" << std::hex << vid_ << " pid=0x" << pid_ << std::dec << std::endl;
 		libusb_exit(ctx_); ctx_ = nullptr; return false;
 	}
-	if (libusb_kernel_driver_active(handle_, interfaceNumber_) == 1) {
-		libusb_detach_kernel_driver(handle_, interfaceNumber_);
+	libusb_set_auto_detach_kernel_driver(handle_, 1);
+
+	uint8_t interfaceToClaim = interfaceNumber_;
+	libusb_config_descriptor* config = nullptr;
+	if (libusb_get_active_config_descriptor(libusb_get_device(handle_), &config) == 0 && config) {
+		for (uint8_t i = 0; i < config->bNumInterfaces; ++i) {
+			const libusb_interface& iface = config->interface[i];
+			for (int a = 0; a < iface.num_altsetting; ++a) {
+				if (hasBulkOutEndpoint(iface.altsetting[a], bulkOutEndpoint_)) {
+					interfaceToClaim = i;
+					break;
+				}
+			}
+			if (interfaceToClaim == i) break;
+		}
+		libusb_free_config_descriptor(config);
 	}
-	r = libusb_claim_interface(handle_, interfaceNumber_);
+
+	if (libusb_kernel_driver_active(handle_, interfaceToClaim) == 1) {
+		libusb_detach_kernel_driver(handle_, interfaceToClaim);
+	}
+	r = libusb_claim_interface(handle_, interfaceToClaim);
+	if (r == LIBUSB_ERROR_BUSY && interfaceToClaim != interfaceNumber_) {
+		// Fallback to configured interface if endpoint-derived candidate is busy.
+		r = libusb_claim_interface(handle_, interfaceNumber_);
+		if (r == 0) interfaceToClaim = interfaceNumber_;
+	}
 	if (r != 0) {
-		std::cerr << "PushDisplayTransport: claim_interface failed " << r << std::endl;
+		std::cerr << "PushDisplayTransport: claim_interface failed " << r
+				  << " (iface=" << int(interfaceToClaim)
+				  << "). Tip: close other Push apps / DAWs using User Port." << std::endl;
 		close();
 		return false;
 	}
+	interfaceNumber_ = interfaceToClaim;
 	r = libusb_set_interface_alt_setting(handle_, interfaceNumber_, altSetting_);
 	if (r != 0) {
 		std::cerr << "PushDisplayTransport: set_interface_alt_setting failed " << r << std::endl;

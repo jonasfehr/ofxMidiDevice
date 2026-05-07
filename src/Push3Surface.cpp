@@ -122,17 +122,19 @@ void Push3Surface::setupSurface(const std::string& inputPort, const std::string&
 	midiComponentGroups[knobsGroup.name] = knobsGroup;
 	parameterGroup.add(knobsGroup.parameterGroup);
 
-	// Rows of buttons seen as NOTE pitches 0..11 (status 144)
-	for (int p = 0; p <= 11; ++p)
+	// Two rows of display/encoder buttons as NOTE pitches 0..15.
+	for (int i = 0; i < 8; ++i)
 	{
-		addButton("touch_knob_" + ofToString(p), kMidiChannel, p, CMT_NOTE);
+		addButton("subpage_" + ofToString(i + 1), kMidiChannel, i, CMT_NOTE);
+		addButton("media_" + ofToString(i + 1), kMidiChannel, 8 + i, CMT_NOTE);
 	}
 
 	MidiComponentGroup touchButtons;
 	touchButtons.setup("touch_buttons");
-	for (int p = 0; p <= 11; ++p)
+	for (int i = 1; i <= 8; ++i)
 	{
-		touchButtons.add(midiComponents["touch_knob_" + ofToString(p)]);
+		touchButtons.add(midiComponents["subpage_" + ofToString(i)]);
+		touchButtons.add(midiComponents["media_" + ofToString(i)]);
 	}
 	midiComponentGroups[touchButtons.name] = touchButtons;
 	parameterGroup.add(touchButtons.parameterGroup);
@@ -289,41 +291,11 @@ void Push3Surface::updatePadGrid()
 		return;
 	}
 
-	auto noteFor = [](int row, int col) {
-		return kPadBaseNote + row * kGridCols + col;
-	};
-	auto indexFor = [](int row, int col) {
-		return row * kGridCols + col;
-	};
-	const std::array<unsigned char, kMeterRows> meterColors{
-		kPaletteCyan,
-		kPaletteLime,
-		kPaletteYellow,
-		kPaletteAmberBright,
-		kPaletteRed,
-	};
-
-	for (int col = 0; col < kGridCols; ++col) {
-		bool hasSlot = col < static_cast<int>(lastLabels.size()) && !lastLabels[col].empty();
-		if (!hasSlot) continue;
-
-		float value = col < static_cast<int>(lastValues.size()) ? ofClamp(lastValues[col], 0.f, 1.f) : 0.f;
-		int filledRows = static_cast<int>(std::ceil(value * kMeterRows));
-		for (int row = 0; row < kMeterRows; ++row) {
-			int gridRow = kActionRows + row;
-			if (row < filledRows) {
-				desired[indexFor(gridRow, col)] = meterColors[row];
-			} else if (value > 0.f) {
-				desired[indexFor(gridRow, col)] = kPaletteDim;
-			}
-		}
-	}
-
 	for (int row = 0; row < kGridRows; ++row) {
 		for (int col = 0; col < kGridCols; ++col) {
-			auto index = indexFor(row, col);
+			auto index = row * kGridCols + col;
 			if (desired[index] == lastPadPalette[index]) continue;
-			midiOut.sendNoteOn(1, noteFor(row, col), desired[index]);
+			midiOut.sendNoteOn(1, kPadBaseNote + index, desired[index]);
 			lastPadPalette[index] = desired[index];
 		}
 	}
