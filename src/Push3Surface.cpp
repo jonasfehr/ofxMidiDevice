@@ -255,15 +255,32 @@ void Push3Surface::bindGridInput()
 	}
 }
 
+void Push3Surface::newMidiMessage(ofxMidiMessage &msg)
+{
+	// Keep default component updates (buttons/faders/encoders) intact.
+	ofxMidiDevice::newMidiMessage(msg);
+
+	// Timeline grid cues should trigger on pad press (NOTE_ON), not on release.
+	if (!cueGridEnabled || !gridTriggerHandler) return;
+	if (msg.channel != kMidiChannel) return;
+	if (msg.status != MIDI_NOTE_ON || msg.velocity <= 0) return;
+
+	const int index = msg.pitch - kPadBaseNote;
+	if (index < 0 || index >= (kGridCols * kGridRows)) return;
+
+	const int row = index / kGridCols;
+	const int col = index % kGridCols;
+	auto cellIt = gridCellsByLabel.find(gridLabel(row, col));
+	if (cellIt == gridCellsByLabel.end()) return;
+
+	gridTriggerHandler(cellIt->second);
+}
+
 void Push3Surface::onGridPadTriggered(std::string& name)
 {
-	if (!cueGridEnabled || !gridTriggerHandler) return;
-	auto componentIt = midiComponents.find(name);
-	if (componentIt == midiComponents.end()) return;
-	if (componentIt->second.value.get() < 0.5f) return;
-	auto cellIt = gridCellsByLabel.find(name);
-	if (cellIt == gridCellsByLabel.end()) return;
-	gridTriggerHandler(cellIt->second);
+	(void)name;
+	// Grid triggering is handled in newMidiMessage() on NOTE_ON to ensure
+	// immediate action on push (instead of value-change semantics on release).
 }
 
 void Push3Surface::updatePadGrid()

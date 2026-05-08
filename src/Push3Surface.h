@@ -12,6 +12,7 @@
 class Push3Surface : public MidiControlSurface {
 public:
 	void setupSurface(const std::string& inputPort, const std::string& outputPort) override;
+	void newMidiMessage(ofxMidiMessage & msg) override;
 	void onProfileLoaded(const DeviceProfile& profile) override;
 	bool supportsGrid() const override { return true; }
 	void setGridTriggerHandler(GridTriggerHandler handler) override;
