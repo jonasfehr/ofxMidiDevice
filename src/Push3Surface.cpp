@@ -353,6 +353,20 @@ void Push3Surface::updateTimelineGrid(const TimelineGridState& state) {
 }
 
 void Push3Surface::updatePageDisplay(const std::string& pageTitle) {
+	// Guard against transient empty titles to avoid clearing the display.
+	if (pageTitle.empty()) {
+		if (!lastTitle.empty()) {
+			sendFrame(lastTitle, lastLabels, lastValues);
+		}
+		updatePadGrid();
+		return;
+	}
+
+	if (pageTitle == lastTitle) {
+		updatePadGrid();
+		return;
+	}
+
 	lastTitle = pageTitle;
 	sendFrame(pageTitle, lastLabels, lastValues);
 	updatePadGrid();
@@ -360,6 +374,31 @@ void Push3Surface::updatePageDisplay(const std::string& pageTitle) {
 
 void Push3Surface::updateParameterDisplay(const std::vector<std::string>& parameterLabels,
 									 const std::vector<float>& parameterValues) {
+	bool labelsChanged = (parameterLabels.size() != lastLabels.size());
+	if (!labelsChanged) {
+		for (size_t i = 0; i < parameterLabels.size(); ++i) {
+			if (parameterLabels[i] != lastLabels[i]) {
+				labelsChanged = true;
+				break;
+			}
+		}
+	}
+
+	bool valuesChanged = (parameterValues.size() != lastValues.size());
+	if (!valuesChanged) {
+		for (size_t i = 0; i < parameterValues.size(); ++i) {
+			if (std::abs(parameterValues[i] - lastValues[i]) > 0.01f) {
+				valuesChanged = true;
+				break;
+			}
+		}
+	}
+
+	if (!labelsChanged && !valuesChanged) {
+		updatePadGrid();
+		return;
+	}
+
 	lastLabels = parameterLabels;
 	lastValues = parameterValues;
 	if (!lastTitle.empty()) {
@@ -547,9 +586,9 @@ void Push3Surface::attachMonitor(bool enable)
 
 void Push3Surface::onUpdate(ofEventArgs&)
 {
-	// Keep alive at ~1Hz, don't reopen from update
+	// Keep alive only occasionally to reduce continuous USB traffic.
 	const uint64_t now = ofGetElapsedTimeMillis();
-	if (now - lastFrameMillis < 1000) return;
+	if (now - lastFrameMillis < 1500) return;
 	if (!display || !display->isOpen()) return;
 	if (lastTitle.empty()) return;
 	sendFrame(lastTitle, lastLabels, lastValues);
