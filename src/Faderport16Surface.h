@@ -1,14 +1,10 @@
 #pragma once
-#include <vector>
 #include "MidiControlSurface.h"
 
 class Faderport16Surface : public MidiControlSurface {
 public:
 	void setupSurface(const std::string& inputPort, const std::string& outputPort) override;
 	void onProfileLoaded(const DeviceProfile& profile) override;
-	void updatePageDisplay(const std::string& pageTitle) override;
-	void updateParameterDisplay(const std::vector<std::string>& parameterLabels,
-							   const std::vector<float>& parameterValues) override;
-private:
-	void setDisplayMode(int channel, bool clear);
+	// updatePageDisplay and updateParameterDisplay are inherited from MidiControlSurface
+	// and delegate to the SysexCharDisplay created in setupSurface.
 };

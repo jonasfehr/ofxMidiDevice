@@ -63,15 +63,6 @@ void LaunchpadSurface::setupSurface(const std::string& inputPort, const std::str
 	gui.add(parameterGroup);
 }
 
-void LaunchpadSurface::onProfileLoaded(const DeviceProfile& /*profile*/){
-	// No-op: no alphanumeric display
-}
-
-void LaunchpadSurface::updatePageDisplay(const std::string&){
-	// No-op: no alphanumeric display
-}
-
-void LaunchpadSurface::updateParameterDisplay(const std::vector<std::string>& /*parameterLabels*/,
-											  const std::vector<float>& /*parameterValues*/){
-	// Launchpad has no alphanumeric display
+void LaunchpadSurface::onProfileLoaded(const DeviceProfile& /*profile*/) {
+	// No display_ set — no alphanumeric display on this device.
 }

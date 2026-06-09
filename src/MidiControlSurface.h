@@ -1,10 +1,12 @@
 #pragma once
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 #include "ofMain.h"
 #include "ofxMidiDevice.h"
 #include "DeviceProfile.h"
+#include "IControllerDisplay.h"
 
 struct CueGridItem {
 	std::string name;
@@ -46,7 +48,16 @@ public:
 	// Optional hook for device-specific initialization after JSON profile setup.
 	virtual void onProfileLoaded(const DeviceProfile& /*profile*/) {}
 
-	virtual void updatePageDisplay(const std::string& pageTitle) = 0;
+	// Default implementations delegate to display_. Surfaces with side-effects
+	// (e.g. Push3 also needs to update its pad grid) should override and call super.
+	virtual void updatePageDisplay(const std::string& title) {
+		if (display_) display_->showPage(title);
+	}
+	virtual void updateParameterDisplay(const std::vector<std::string>& labels,
+	                                    const std::vector<float>& values) {
+		if (display_) display_->showParameters(labels, values);
+	}
+
 	virtual bool supportsGrid() const { return false; }
 	virtual void setGridTriggerHandler(GridTriggerHandler /*handler*/) {}
 	virtual void updateTimelineGrid(const TimelineGridState& /*state*/) {}
@@ -55,6 +66,7 @@ public:
 		state.cells = cues;
 		updateTimelineGrid(state);
 	}
-	virtual void updateParameterDisplay(const std::vector<std::string>& parameterLabels,
-									   const std::vector<float>& parameterValues) = 0;
+
+protected:
+	std::unique_ptr<IControllerDisplay> display_;
 };
