@@ -84,12 +84,23 @@ void ofxMidiDevice::setupFromFile(string filename) {
 	gui.add(parameterGroup);
 }
 
+// Linux/ALSA returns full port names like "ClientName:PortName NN:MM".
+// This resolves a short profile name to the first matching full port name,
+// falling back to the original name if no match is found (macOS exact names work fine).
+static std::string resolvePortName(const std::vector<std::string>& ports, const std::string& name) {
+	for (const auto& p : ports)
+		if (p == name || p.find(name) != std::string::npos) return p;
+	return name;
+}
+
 void ofxMidiDevice::setupFromProfile(const DeviceProfile & profile) {
 	midiComponents.clear();
 	midiComponentGroups.clear();
 	bindings = profile.bindings;
 
-	setup(profile.midiInPort, profile.midiOutPort);
+	std::string inPort  = resolvePortName(midiIn.getInPortList(),  profile.midiInPort);
+	std::string outPort = resolvePortName(midiOut.getOutPortList(), profile.midiOutPort);
+	setup(inPort, outPort);
 
 	auto addComponent = [&](const ControlComponent & comp) {
 		if (comp.interfaceType == IT_FADER) {
