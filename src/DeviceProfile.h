@@ -110,7 +110,8 @@ inline std::optional<std::vector<DeviceProfile>> loadDeviceProfiles(const std::s
 
 		if (node.contains("bindings") && node["bindings"].is_object()) {
 			for (auto it = node["bindings"].begin(); it != node["bindings"].end(); ++it) {
-				p.bindings[it.key()] = it.value().get<std::string>();
+				if (it.value().is_string())
+					p.bindings[it.key()] = it.value().get<std::string>();
 			}
 		}
 		profiles.push_back(std::move(p));
