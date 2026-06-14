@@ -89,7 +89,9 @@ void Push3Surface::onProfileLoaded(const DeviceProfile& profile)
 	ofRemoveListener(ofEvents().update, this, &Push3Surface::onUpdate);
 	ofAddListener(ofEvents().update, this, &Push3Surface::onUpdate);
 
-	attachMonitor(false);
+	// Monitor kept active to log unknown MIDI CCs for hardware discovery.
+	// Once the master encoder CC is confirmed, this can be removed.
+	attachMonitor(true);
 	lastCueColors.fill(0xFFFFFFFFu);
 }
 
