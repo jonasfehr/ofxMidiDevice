@@ -208,6 +208,9 @@ public:
 	{
 		if (doFeedback)
 		{
+			// No feedback without an open output port (virtual/emulator surface).
+			if (midiOut == nullptr || !midiOut->isOpen())
+				return;
 			float diff = abs(value.get() - valueOld);
 			if (diff < 0.01 && diff > 0)
 				return; // just update if difference bigger than 1/100, to avoid over flow of data to MIDI device.
