@@ -12,6 +12,7 @@ struct ControlComponent {
 	int address = 0;
 	ControlMessageTypes type = CMT_CONTROL_CHANGE;
 	InterfaceTypes interfaceType = IT_BUTTON; // fader, knob, button, encoder, display
+	std::string role; // target role this component is bound to (empty if unbound)
 };
 
 struct GridComponentProfile {
@@ -88,7 +89,12 @@ inline std::optional<std::vector<DeviceProfile>> loadDeviceProfiles(const std::s
 				comp.address = c.value("address", 0);
 				comp.type = parseCmt(c.value("type", "cc"));
 				comp.interfaceType = parseIT(c.value("interfaceType", ""));
+				comp.role = c.value("role", "");
 				if (!comp.label.empty()) p.components[comp.label] = comp;
+			}
+			// Build role→label index from component roles
+			for (auto& [lbl, comp] : p.components) {
+				if (!comp.role.empty()) p.bindings[comp.role] = lbl;
 			}
 		}
 

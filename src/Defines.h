@@ -19,11 +19,11 @@ enum ControlMessageTypes{
 };
 
 enum InterfaceTypes{
-	IT_UNKONWN,
+	IT_UNKNOWN,
 	IT_FADER,
 	IT_KNOB,
 	IT_BUTTON,
-	IT_BUTTON_LP // sepcial feedback for LaunchPad
+	IT_BUTTON_LP // special feedback for LaunchPad
 };
 
 
