@@ -67,12 +67,20 @@ void PlatformMSurface::setupSurface(const std::string& inputPort,
 	gui.setup("MIDI in");
 	gui.add(parameterGroup);
 
+	createDisplay();
+}
+
+// The app builds surfaces via setupFromProfile() + onProfileLoaded() and never
+// calls setupSurface(), so the display must be created on both paths.
+void PlatformMSurface::createDisplay() {
 	display_ = std::make_unique<SysexCharDisplay>(
-		[this](std::vector<unsigned char> b){ midiOut.sendMidiBytes(b); },
+		[this](std::vector<unsigned char> b){
+			if (midiOut.isOpen()) midiOut.sendMidiBytes(b);
+		},
 		SysexDisplayConfig::platformM()
 	);
 }
 
 void PlatformMSurface::onProfileLoaded(const DeviceProfile& /*profile*/) {
-	// No special display init required; SysEx updates on next page/parameter call.
+	if (!display_) createDisplay();
 }

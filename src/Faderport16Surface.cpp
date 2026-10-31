@@ -59,13 +59,22 @@ void Faderport16Surface::setupSurface(const std::string& inputPort,
 	gui.setup("MIDI in");
 	gui.add(parameterGroup);
 
+	createDisplay();
+}
+
+// The app builds surfaces via setupFromProfile() + onProfileLoaded() and never
+// calls setupSurface(), so the display must be created on both paths.
+void Faderport16Surface::createDisplay() {
 	display_ = std::make_unique<SysexCharDisplay>(
-		[this](std::vector<unsigned char> b){ midiOut.sendMidiBytes(b); },
+		[this](std::vector<unsigned char> b){
+			if (midiOut.isOpen()) midiOut.sendMidiBytes(b);
+		},
 		SysexDisplayConfig::faderport16()
 	);
 }
 
 void Faderport16Surface::onProfileLoaded(const DeviceProfile& /*profile*/) {
-	// Display is already set up; the SysexCharDisplay will update on the
-	// next updatePageDisplay / updateParameterDisplay call.
+	if (!display_) createDisplay();
+	// Clear all channel displays and write the fixed SPD./DMX/VID. labels.
+	display_->showPage("");
 }
